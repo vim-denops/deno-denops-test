@@ -10,6 +10,7 @@ import { DENOPS_PATH } from "./conf.ts";
 
 const PLUGIN_NAME = "@denops-test";
 
+/** Options for `withDenops` function */
 export type WithDenopsOptions = {
   /** Print Vim messages (echomsg) */
   verbose?: boolean;

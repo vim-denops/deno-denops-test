@@ -3,8 +3,10 @@ import type { Denops } from "https://deno.land/x/denops_core@v3.3.1/mod.ts";
 import type { RunMode } from "./runner.ts";
 import { withDenops } from "./with.ts";
 
+/** Test running mode */
 export type TestMode = RunMode | "any" | "all";
 
+/** Test definition used in `test` function */
 export type TestDefinition = Omit<Deno.TestDefinition, "fn"> & {
   fn: (denops: Denops) => void | Promise<void>;
   /**
