@@ -11,14 +11,14 @@ import { DENOPS_PATH } from "./conf.ts";
 const PLUGIN_NAME = "@denops-test";
 
 /** Options for `withDenops` function */
-export type WithDenopsOptions = {
+export interface WithDenopsOptions {
   /** Print Vim messages (echomsg) */
   verbose?: boolean;
   /** Vim commands to be executed before the start of Denops */
   prelude?: string[];
   /** Vim commands to be executed after the start of Denops */
   postlude?: string[];
-};
+}
 
 /**
  * Function to be executed by passing a denops instance for testing to the specified function
