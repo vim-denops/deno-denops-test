@@ -86,7 +86,11 @@ export async function withDenops(
           "call",
           "denops#_internal#meta#get",
         ) as Meta;
-        await main(await newDenopsImpl(meta, session));
+        const denops = await newDenopsImpl(meta, session);
+        // Workaround for unexpected "leaking async ops"
+        // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await main(denops);
       },
     );
   } finally {
