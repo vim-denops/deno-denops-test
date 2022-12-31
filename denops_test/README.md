@@ -7,6 +7,9 @@
 [Deno][deno] module for testing [denops.vim][denops.vim]. This module is assumed
 to be used in unittests of denops plugin.
 
+[deno]: https://deno.land/
+[denops.vim]: https://github.com/vim-denops/denops.vim
+
 By using this module, developers can write denops tests like:
 
 ```typescript
