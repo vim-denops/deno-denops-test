@@ -4,11 +4,10 @@ import { NVIM_EXECUTABLE, VIM_EXECUTABLE } from "./conf.ts";
 export type RunMode = "vim" | "nvim";
 
 /** Runner option */
-export type RunOptions =
-  & Omit<Deno.RunOptions, "cmd" | "stdin" | "stdout" | "stderr">
-  & {
-    verbose?: boolean;
-  };
+export interface RunOptions
+  extends Omit<Deno.RunOptions, "cmd" | "stdin" | "stdout" | "stderr"> {
+  verbose?: boolean;
+}
 
 /**
  * Runs the specified commands in the runner
