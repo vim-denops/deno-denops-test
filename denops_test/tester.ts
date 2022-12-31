@@ -1,138 +1,47 @@
-import * as path from "https://deno.land/std@0.170.0/path/mod.ts";
-import { Session } from "https://deno.land/x/msgpack_rpc@v3.1.6/mod.ts#^";
-import { using } from "https://deno.land/x/disposable@v1.1.0/mod.ts#^";
-import { deadline } from "https://deno.land/std@0.170.0/async/mod.ts";
-import type {
-  Denops,
-  Meta,
-} from "https://deno.land/x/denops_core@v3.3.1/mod.ts";
-import { DENOPS_TEST_NVIM, DENOPS_TEST_VIM, run } from "./runner.ts";
+import { sample } from "https://deno.land/std@0.170.0/collections/sample.ts";
+import type { Denops } from "https://deno.land/x/denops_core@v3.3.1/mod.ts";
+import type { RunMode } from "./runner.ts";
+import { withDenops } from "./with.ts";
 
-const DEFAULT_TIMEOUT = Number(
-  Deno.env.get("DENOPS_TEST_DEFAULT_TIMEOUT") ?? "30000",
-);
-
-const DENOPS_PATH = Deno.env.get("DENOPS_PATH");
-
-type WithDenopsOptions = {
-  pluginName?: string;
-  timeout?: number;
-  verbose?: boolean;
-  prelude?: string[];
-};
-
-async function withDenops(
-  mode: "vim" | "nvim",
-  main: (denops: Denops) => Promise<void> | void,
-  options: WithDenopsOptions,
-) {
-  if (!DENOPS_PATH) {
-    throw new Error("`DENOPS_PATH` environment variable is not defined");
-  }
-  const denopsPath = path.resolve(DENOPS_PATH);
-  const scriptPath = path.join(
-    denopsPath,
-    "denops",
-    "@denops",
-    "test",
-    "bypass",
-    "cli.ts",
-  );
-  const listener = Deno.listen({
-    hostname: "127.0.0.1",
-    port: 0, // Automatically select free port
-  });
-  const pluginName = options.pluginName ?? "@denops-core-test";
-  const proc = run(mode, {
-    commands: [
-      ...(options.prelude ?? []),
-      `let g:denops#_test = 1`,
-      `set runtimepath^=${DENOPS_PATH}`,
-      `autocmd User DenopsReady call denops#plugin#register('${pluginName}', '${scriptPath}')`,
-      "call denops#server#start()",
-    ],
-    env: {
-      "DENOPS_TEST_ADDRESS": JSON.stringify(listener.addr),
-    },
-    verbose: options.verbose,
-  });
-  const conn = await listener.accept();
-  try {
-    await using(
-      new Session(conn, conn, {}, {
-        errorCallback(e) {
-          if (e.name === "Interrupted") {
-            return;
-          }
-          console.error("Unexpected error occurred", e);
-        },
-      }),
-      async (session) => {
-        const meta = await session.call(
-          "call",
-          "denops#_internal#meta#get",
-        ) as Meta;
-        const denops = await newDenopsImpl(pluginName, meta, session);
-        const runner = async () => {
-          await main(denops);
-        };
-        await deadline(runner(), options.timeout ?? DEFAULT_TIMEOUT);
-      },
-    );
-  } finally {
-    proc.stdin?.close();
-    await killProcess(proc);
-    await proc.status();
-    proc.close();
-    conn.close();
-    listener.close();
-  }
-}
-
-async function newDenopsImpl(
-  pluginName: string,
-  meta: Meta,
-  session: Session,
-): Promise<Denops> {
-  if (!DENOPS_PATH) {
-    throw new Error("`DENOPS_PATH` environment variable is not defined");
-  }
-  const { DenopsImpl } = await import(path.join(
-    path.resolve(DENOPS_PATH),
-    "denops",
-    "@denops-private",
-    "impl.ts",
-  ));
-  return new DenopsImpl(pluginName, meta, session);
-}
+export type TestMode = RunMode | "any" | "all";
 
 export type TestDefinition = Omit<Deno.TestDefinition, "fn"> & {
-  mode: "vim" | "nvim" | "any" | "all";
-  fn: (denops: Denops) => Promise<void> | void;
-  pluginName?: string;
-  timeout?: number;
+  fn: (denops: Denops) => void | Promise<void>;
+  /**
+   * Test runner mode
+   *
+   * Specifying "vim" or "nvim" will run the test with the specified runner.
+   * If "any" is specified, Vim or Neovim is randomly selected and executed.
+   * When "all" is specified, the test is run with both Vim and Neovim.
+   */
+  mode: TestMode;
+  /** Print Vim messages (echomsg) */
   verbose?: boolean;
+  /** Vim commands to be executed before the start of Denops */
   prelude?: string[];
+  /** Vim commands to be executed after the start of Denops */
+  postlude?: string[];
 };
 
 /**
- * Register a test which will be run when `deno test` is used on the command line
- * and the containing module looks like a test module.
+ * Register a test for denops to be run when `deno test` is used.
  *
- * `fn` receive `denops` instance which communicate with a real Vim/Neovim.
+ * This function internally uses `Deno.test` and `withDenops` to run
+ * tests by passing a `denops` instance to the registered test function.
  *
- * To use this function, developer must provides the following environment variables:
+ * ```ts
+ * test("vim", "Test with Vim", async (denops) => {
+ *   assertFalse(await denops.call("has", "nvim"));
+ * });
  *
- * `DENOPS_PATH`
- * A path to `denops.vim` for adding to Vim's `runtimepath`
- *
- * `DENOPS_TEST_VIM`
- * An executable of Vim
- *
- * `DENOPS_TEST_NVIM`
- * An executable of Neovim
- *
- * Otherwise tests using this static method will be ignored.
+ * test({
+ *   mode: "nvim",
+ *   name: "Test with Neovim",
+ *   fn: async (denops) => {
+ *     assert(await denops.call("has", "nvim"));
+ *   }),
+ * });
+ * ```
  */
 export function test(
   mode: TestDefinition["mode"],
@@ -176,7 +85,7 @@ function testInternal(t: TestDefinition): void {
       mode: "nvim",
     });
   } else if (mode === "any") {
-    const m = DENOPS_TEST_NVIM ? "nvim" : "vim";
+    const m = sample(["vim", "nvim"] as const)!;
     testInternal({
       ...t,
       name: `${t.name} (${m})`,
@@ -185,34 +94,13 @@ function testInternal(t: TestDefinition): void {
   } else {
     Deno.test({
       ...t,
-      ignore: t.ignore || !DENOPS_PATH ||
-        (mode === "vim" && !DENOPS_TEST_VIM) ||
-        (mode === "nvim" && !DENOPS_TEST_NVIM),
-      fn: async () => {
-        await withDenops(mode, t.fn, {
-          pluginName: t.pluginName,
-          timeout: t.timeout,
+      fn: () => {
+        return withDenops(mode, t.fn, {
           verbose: t.verbose,
           prelude: t.prelude,
+          postlude: t.postlude,
         });
       },
     });
-  }
-}
-
-async function killProcess(proc: Deno.Process): Promise<void> {
-  if (Deno.build.os === "windows") {
-    // Signal API in Deno v1.14.0 on Windows
-    // does not work so use `taskkill` for now
-    const p = Deno.run({
-      cmd: ["taskkill", "/pid", proc.pid.toString(), "/F"],
-      stdin: "null",
-      stdout: "null",
-      stderr: "null",
-    });
-    await p.status();
-    p.close();
-  } else {
-    proc.kill("SIGTERM");
   }
 }
