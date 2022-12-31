@@ -22,7 +22,7 @@ test(
   "test(mode:vim) start vim to test denops features",
   async (denops) => {
     assertFalse(await denops.call("has", "nvim"));
-  }
+  },
 );
 
 test({
@@ -39,7 +39,7 @@ test({
   fn: async (denops) => {
     assertEquals(
       await denops.call("range", 10),
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     );
   },
 });
@@ -50,7 +50,7 @@ test({
   fn: async (denops) => {
     assertEquals(
       await denops.call("range", 10),
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     );
   },
 });
