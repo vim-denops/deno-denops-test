@@ -91,3 +91,22 @@ test({
     );
   },
 });
+
+test({
+  mode: "all",
+  name: "test(mode:all) pass TestContext to the second argument",
+  fn: async (denops, t) => {
+    await t.step("step1", async () => {
+      assertEquals(
+        await denops.call("range", 10),
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      );
+    });
+    await t.step("step2", async () => {
+      assertEquals(
+        await denops.call("range", 10),
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      );
+    });
+  },
+});

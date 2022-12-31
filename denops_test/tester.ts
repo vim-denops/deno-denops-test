@@ -8,7 +8,7 @@ export type TestMode = RunMode | "any" | "all";
 
 /** Test definition used in `test` function */
 export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
-  fn: (denops: Denops) => void | Promise<void>;
+  fn: (denops: Denops, t: Deno.TestContext) => void | Promise<void>;
   /**
    * Test runner mode
    *
@@ -50,7 +50,7 @@ export function test(
   name: string,
   fn: TestDefinition["fn"],
 ): void;
-export function test(t: TestDefinition): void;
+export function test(def: TestDefinition): void;
 export function test(
   modeOrDefinition: TestDefinition["mode"] | TestDefinition,
   name?: string,
@@ -73,34 +73,34 @@ export function test(
   }
 }
 
-function testInternal(t: TestDefinition): void {
-  const mode = t.mode;
+function testInternal(def: TestDefinition): void {
+  const { mode } = def;
   if (mode === "all") {
     testInternal({
-      ...t,
-      name: `${t.name} (vim)`,
+      ...def,
+      name: `${def.name} (vim)`,
       mode: "vim",
     });
     testInternal({
-      ...t,
-      name: `${t.name} (nvim)`,
+      ...def,
+      name: `${def.name} (nvim)`,
       mode: "nvim",
     });
   } else if (mode === "any") {
     const m = sample(["vim", "nvim"] as const)!;
     testInternal({
-      ...t,
-      name: `${t.name} (${m})`,
+      ...def,
+      name: `${def.name} (${m})`,
       mode: m,
     });
   } else {
     Deno.test({
-      ...t,
-      fn: () => {
-        return withDenops(mode, t.fn, {
-          verbose: t.verbose,
-          prelude: t.prelude,
-          postlude: t.postlude,
+      ...def,
+      fn: (t) => {
+        return withDenops(mode, (denops) => def.fn(denops, t), {
+          verbose: def.verbose,
+          prelude: def.prelude,
+          postlude: def.postlude,
         });
       },
     });
