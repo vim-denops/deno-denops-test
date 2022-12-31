@@ -102,12 +102,13 @@ async function newDenopsImpl(
   meta: Meta,
   session: Session,
 ): Promise<Denops> {
-  const { DenopsImpl } = await import(path.join(
+  const url = path.toFileUrl(path.join(
     DENOPS_PATH,
     "denops",
     "@denops-private",
     "impl.ts",
   ));
+  const { DenopsImpl } = await import(url.href);
   return new DenopsImpl(PLUGIN_NAME, meta, session);
 }
 
