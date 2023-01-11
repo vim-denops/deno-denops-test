@@ -12,6 +12,8 @@ const PLUGIN_NAME = "@denops-test";
 
 /** Options for `withDenops` function */
 export interface WithDenopsOptions {
+  /** Plugin name of test target */
+  pluginName?: string;
   /** Print Vim messages (echomsg) */
   verbose?: boolean;
   /** Vim commands to be executed before the start of Denops */
@@ -59,11 +61,12 @@ export async function withDenops(
     hostname: "127.0.0.1",
     port: 0, // Automatically select free port
   });
+  const pluginName = options.pluginName ?? PLUGIN_NAME;
   const cmds = [
     ...(options.prelude ?? []),
     "let g:denops#_test = 1",
     `set runtimepath^=${DENOPS_PATH}`,
-    `autocmd User DenopsReady call denops#plugin#register('${PLUGIN_NAME}', '${scriptPath}')`,
+    `autocmd User DenopsReady call denops#plugin#register('${pluginName}', '${scriptPath}')`,
     "call denops#server#start()",
     ...(options.postlude ?? []),
   ];
@@ -89,7 +92,7 @@ export async function withDenops(
           "call",
           "denops#_internal#meta#get",
         ) as Meta;
-        const denops = await newDenopsImpl(meta, session);
+        const denops = await newDenopsImpl(meta, session, pluginName);
         // Workaround for unexpected "leaking async ops"
         // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
         await new Promise((resolve) => setTimeout(resolve, 0));
@@ -109,6 +112,7 @@ export async function withDenops(
 async function newDenopsImpl(
   meta: Meta,
   session: Session,
+  pluginName: string,
 ): Promise<Denops> {
   const url = path.toFileUrl(path.join(
     DENOPS_PATH,
@@ -117,7 +121,7 @@ async function newDenopsImpl(
     "impl.ts",
   ));
   const { DenopsImpl } = await import(url.href);
-  return new DenopsImpl(PLUGIN_NAME, meta, session);
+  return new DenopsImpl(pluginName, meta, session);
 }
 
 async function killProcess(proc: Deno.Process): Promise<void> {
