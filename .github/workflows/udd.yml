@@ -15,7 +15,7 @@ jobs:
           deno-version: "1.x"
       - name: Update dependencies
         run: |
-          make deps > ../output.txt
+          deno task upgrade > ../output.txt
         env:
           NO_COLOR: 1
       - name: Read ../output.txt
@@ -39,7 +39,7 @@ jobs:
         with:
           title: ":package: Update Deno dependencies"
           body: |
-            The output of `make update` is
+            The output of `deno task upgrade` is
 
             ```
             ${{ steps.log.outputs.content }}
