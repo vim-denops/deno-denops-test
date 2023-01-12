@@ -17,6 +17,8 @@ export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
    * When "all" is specified, the test is run with both Vim and Neovim.
    */
   mode: TestMode;
+  /** Plugin name of test target */
+  pluginName?: string;
   /** Print Vim messages (echomsg) */
   verbose?: boolean;
   /** Vim commands to be executed before the start of Denops */
@@ -101,6 +103,7 @@ function testInternal(def: TestDefinition): void {
       ...def,
       fn: (t) => {
         return withDenops(mode, (denops) => def.fn(denops, t), {
+          pluginName: def.pluginName,
           verbose: def.verbose,
           prelude: def.prelude,
           postlude: def.postlude,
