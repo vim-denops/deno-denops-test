@@ -32,6 +32,9 @@ export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
  * tests by passing a `denops` instance to the registered test function.
  *
  * ```ts
+ * import { assert, assertFalse } from "https://deno.land/std/testing/asserts.ts";
+ * import { test } from "./tester.ts";
+ *
  * test("vim", "Test with Vim", async (denops) => {
  *   assertFalse(await denops.call("has", "nvim"));
  * });
@@ -41,7 +44,7 @@ export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
  *   name: "Test with Neovim",
  *   fn: async (denops) => {
  *     assert(await denops.call("has", "nvim"));
- *   }),
+ *   },
  * });
  * ```
  */

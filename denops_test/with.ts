@@ -33,6 +33,9 @@ export interface WithDenopsOptions {
  * internally spawns Vim/Neovim sub-process, which performs the tests.
  *
  * ```ts
+ * import { assert, assertFalse } from "https://deno.land/std/testing/asserts.ts";
+ * import { withDenops } from "./with.ts";
+ *
  * Deno.test("Test denops (vim)", async () => {
  *   await withDenops("vim", async (denops) => {
        assertFalse(await denops.call("has", "nvim"));
