@@ -1,4 +1,4 @@
-import * as path from "https://deno.land/std@0.170.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.171.0/path/mod.ts";
 import { orElse } from "./or_else.ts";
 
 function get(name: string): string | undefined {

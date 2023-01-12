@@ -1,4 +1,4 @@
-import { copy } from "https://deno.land/std@0.170.0/streams/copy.ts";
+import { copy } from "https://deno.land/std@0.171.0/streams/copy.ts";
 import {
   WorkerReader,
   WorkerWriter,
