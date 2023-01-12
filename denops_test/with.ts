@@ -1,10 +1,10 @@
-import * as path from "https://deno.land/std@0.170.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.171.0/path/mod.ts";
 import { Session } from "https://deno.land/x/msgpack_rpc@v3.1.6/mod.ts#^";
 import { using } from "https://deno.land/x/disposable@v1.1.0/mod.ts#^";
 import type {
   Denops,
   Meta,
-} from "https://deno.land/x/denops_core@v3.3.1/mod.ts";
+} from "https://deno.land/x/denops_core@v4.0.0/mod.ts";
 import { run, RunMode } from "./runner.ts";
 import { DENOPS_PATH } from "./conf.ts";
 
@@ -33,6 +33,9 @@ export interface WithDenopsOptions {
  * internally spawns Vim/Neovim sub-process, which performs the tests.
  *
  * ```ts
+ * import { assert, assertFalse } from "https://deno.land/std/testing/asserts.ts";
+ * import { withDenops } from "./with.ts";
+ *
  * Deno.test("Test denops (vim)", async () => {
  *   await withDenops("vim", async (denops) => {
        assertFalse(await denops.call("has", "nvim"));

@@ -1,5 +1,5 @@
-import { sample } from "https://deno.land/std@0.170.0/collections/sample.ts";
-import type { Denops } from "https://deno.land/x/denops_core@v3.3.1/mod.ts";
+import { sample } from "https://deno.land/std@0.171.0/collections/sample.ts";
+import type { Denops } from "https://deno.land/x/denops_core@v4.0.0/mod.ts";
 import type { RunMode } from "./runner.ts";
 import { withDenops } from "./with.ts";
 
@@ -32,6 +32,9 @@ export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
  * tests by passing a `denops` instance to the registered test function.
  *
  * ```ts
+ * import { assert, assertFalse } from "https://deno.land/std/testing/asserts.ts";
+ * import { test } from "./tester.ts";
+ *
  * test("vim", "Test with Vim", async (denops) => {
  *   assertFalse(await denops.call("has", "nvim"));
  * });
@@ -41,7 +44,7 @@ export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
  *   name: "Test with Neovim",
  *   fn: async (denops) => {
  *     assert(await denops.call("has", "nvim"));
- *   }),
+ *   },
  * });
  * ```
  */

@@ -6,10 +6,7 @@
  * [denops.vim]: https://github.com/vim-denops/denops.vim
  *
  * ```typescript
- * import {
- *   assertEquals,
- *   assertFalse,
- * } from "https://deno.land/std@0.170.0/testing/asserts.ts";
+ * import { assert, assertFalse } from "https://deno.land/std/testing/asserts.ts";
  * import { test } from "./mod.ts";
  *
  * test(
