@@ -5,7 +5,7 @@ export type RunMode = "vim" | "nvim";
 
 /** Runner option */
 export interface RunOptions
-  extends Omit<Deno.RunOptions, "cmd" | "stdin" | "stdout" | "stderr"> {
+  extends Omit<Deno.CommandOptions, "cmd" | "stdin" | "stdout" | "stderr"> {
   verbose?: boolean;
 }
 
@@ -16,19 +16,20 @@ export function run(
   mode: RunMode,
   cmds: string[],
   options: RunOptions = {},
-): Deno.Process {
-  const cmd = [...buildArgs(mode), ...cmds.flatMap((c) => ["-c", c])];
+): Deno.ChildProcess {
+  const [cmd, args] = buildArgs(mode);
+  args.unshift(...cmds.flatMap((c) => ["-c", c]));
   if (options.verbose) {
-    cmd.unshift("--cmd", "redir >> /dev/stdout");
+    args.unshift("--cmd", "redir >> /dev/stdout");
   }
-  const proc = Deno.run({
-    cmd,
+  const command = new Deno.Command(cmd, {
+    args,
     env: options.env,
     stdin: "piped",
     stdout: options.verbose ? "inherit" : "null",
     stderr: options.verbose ? "inherit" : "null",
   });
-  return proc;
+  return command.spawn();
 }
 
 /**
@@ -44,28 +45,17 @@ export function isRunMode(mode: string): mode is RunMode {
   }
 }
 
-function buildArgs(mode: RunMode): string[] {
+function buildArgs(mode: RunMode): [string, string[]] {
   switch (mode) {
     case "vim":
       return [
         VIM_EXECUTABLE,
-        "-u",
-        "NONE",
-        "-i",
-        "NONE",
-        "-n",
-        "-N",
-        "-X",
-        "-e",
-        "-s",
+        ["-u", "NONE", "-i", "NONE", "-n", "-N", "-X", "-e", "-s"],
       ];
     case "nvim":
       return [
         NVIM_EXECUTABLE,
-        "--clean",
-        "--embed",
-        "--headless",
-        "-n",
+        ["--clean", "--embed", "--headless", "-n"],
       ];
   }
 }

@@ -100,10 +100,9 @@ export async function withDenops(
       },
     );
   } finally {
-    proc.stdin?.close();
-    await killProcess(proc);
-    await proc.status();
-    proc.close();
+    proc.stdin.close();
+    proc.kill();
+    await proc.status;
     conn.close();
     listener.close();
   }
@@ -122,21 +121,4 @@ async function newDenopsImpl(
   ));
   const { DenopsImpl } = await import(url.href);
   return new DenopsImpl(pluginName, meta, session);
-}
-
-async function killProcess(proc: Deno.Process): Promise<void> {
-  if (Deno.build.os === "windows") {
-    // Signal API in Deno v1.14.0 on Windows
-    // does not work so use `taskkill` for now
-    const p = Deno.run({
-      cmd: ["taskkill", "/pid", proc.pid.toString(), "/F"],
-      stdin: "null",
-      stdout: "null",
-      stderr: "null",
-    });
-    await p.status();
-    p.close();
-  } else {
-    proc.kill("SIGTERM");
-  }
 }
