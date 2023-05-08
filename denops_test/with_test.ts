@@ -1,7 +1,7 @@
 import {
   assert,
   assertFalse,
-} from "https://deno.land/std@0.171.0/testing/asserts.ts";
+} from "https://deno.land/std@0.186.0/testing/asserts.ts";
 import { withDenops } from "./with.ts";
 
 Deno.test(
