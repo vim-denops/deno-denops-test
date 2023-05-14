@@ -1,8 +1,8 @@
-import { copy } from "https://deno.land/std@0.186.0/streams/copy.ts";
+import { copy } from "https://deno.land/std@0.187.0/streams/copy.ts";
 import {
   WorkerReader,
   WorkerWriter,
-} from "https://deno.land/x/workerio@v1.4.4/mod.ts#^";
+} from "https://deno.land/x/workerio@v3.1.0/mod.ts#^";
 import { orElse } from "./or_else.ts";
 
 const worker = self as unknown as Worker;
