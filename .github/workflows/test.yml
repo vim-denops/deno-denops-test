@@ -98,3 +98,9 @@ jobs:
           DENOPS_TEST_VIM_EXECUTABLE: ${{ steps.vim.outputs.executable_path }}
           DENOPS_TEST_NVIM_EXECUTABLE: ${{ steps.nvim.outputs.executable_path }}
         working-directory: ./repo
+      - run: |
+          deno coverage --unstable .coverage --lcov > coverage.lcov
+        working-directory: ./repo
+      - uses: codecov/codecov-action@v1
+        with:
+          file: ./repo/coverage.lcov
