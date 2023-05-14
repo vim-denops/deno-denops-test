@@ -100,7 +100,7 @@ export async function withDenops(
     await main(denops);
     await session.shutdown();
   } finally {
-    proc.stdin.close();
+    proc.stdin?.close();
     proc.kill();
     await proc.status;
     listener.close();
