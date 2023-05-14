@@ -1,6 +1,8 @@
 import * as path from "https://deno.land/std@0.187.0/path/mod.ts";
-import { Session } from "https://deno.land/x/msgpack_rpc@v3.1.6/mod.ts#^";
-import { using } from "https://deno.land/x/disposable@v1.1.1/mod.ts#^";
+import {
+  Client,
+  Session,
+} from "https://deno.land/x/messagepack_rpc@v1.0.0/mod.ts#^";
 import type {
   Denops,
   Meta,
@@ -78,32 +80,29 @@ export async function withDenops(
   });
   const conn = await listener.accept();
   try {
-    await using(
-      new Session(conn, conn, {}, {
-        errorCallback(e) {
-          if (e.name === "Interrupted") {
-            return;
-          }
-          console.error("Unexpected error occurred", e);
-        },
-      }),
-      async (session) => {
-        const meta = await session.call(
-          "call",
-          "denops#_internal#meta#get",
-        ) as Meta;
-        const denops = await newDenopsImpl(meta, session, pluginName);
-        // Workaround for unexpected "leaking async ops"
-        // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        await main(denops);
-      },
-    );
+    const session = new Session(conn.readable, conn.writable);
+    session.onInvalidMessage = (message) => {
+      console.error("Unexpected message:", message);
+    };
+    session.onMessageError = (error, message) => {
+      console.error(`Unexpected error occured for message ${message}:`, error);
+    };
+    session.start();
+    const client = new Client(session);
+    const meta = await client.call(
+      "call",
+      "denops#_internal#meta#get",
+    ) as Meta;
+    const denops = await newDenopsImpl(meta, session, client, pluginName);
+    // Workaround for unexpected "leaking async ops"
+    // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await main(denops);
+    await session.shutdown();
   } finally {
     proc.stdin.close();
     proc.kill();
     await proc.status;
-    conn.close();
     listener.close();
   }
 }
@@ -111,6 +110,7 @@ export async function withDenops(
 async function newDenopsImpl(
   meta: Meta,
   session: Session,
+  client: Client,
   pluginName: string,
 ): Promise<Denops> {
   const url = path.toFileUrl(path.join(
@@ -120,5 +120,19 @@ async function newDenopsImpl(
     "impl.ts",
   ));
   const { DenopsImpl } = await import(url.href);
-  return new DenopsImpl(pluginName, meta, session);
+  return new DenopsImpl(pluginName, meta, {
+    get dispatcher() {
+      return session.dispatcher;
+    },
+    set dispatcher(dispatcher) {
+      session.dispatcher = dispatcher;
+    },
+    call(method: string, ...params: unknown[]): Promise<unknown> {
+      return client.call(method, ...params);
+    },
+    notify(method: string, ...params: unknown[]): Promise<void> {
+      client.notify(method, ...params);
+      return Promise.resolve();
+    },
+  });
 }
