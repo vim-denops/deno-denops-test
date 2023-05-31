@@ -1,4 +1,4 @@
-import * as path from "https://deno.land/std@0.187.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.190.0/path/mod.ts";
 import {
   Client,
   Session,
@@ -6,7 +6,7 @@ import {
 import type {
   Denops,
   Meta,
-} from "https://deno.land/x/denops_core@v4.0.0/mod.ts";
+} from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
 import { run, RunMode } from "./runner.ts";
 import { DENOPS_PATH } from "./conf.ts";
 
