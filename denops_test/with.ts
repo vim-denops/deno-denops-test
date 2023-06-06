@@ -8,7 +8,7 @@ import type {
   Meta,
 } from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
 import { run, RunMode } from "./runner.ts";
-import { DENOPS_PATH } from "./conf.ts";
+import { Config, getConfig } from "./conf.ts";
 
 const PLUGIN_NAME = "@denops-test";
 
@@ -58,6 +58,7 @@ export async function withDenops(
   main: (denops: Denops) => Promise<void> | void,
   options: WithDenopsOptions = {},
 ) {
+  const conf = getConfig();
   const scriptPath = new URL("./plugin.ts", import.meta.url);
   const listener = Deno.listen({
     hostname: "127.0.0.1",
@@ -67,7 +68,7 @@ export async function withDenops(
   const cmds = [
     ...(options.prelude ?? []),
     "let g:denops#_test = 1",
-    `set runtimepath^=${DENOPS_PATH}`,
+    `set runtimepath^=${conf.denopsPath}`,
     `autocmd User DenopsReady call denops#plugin#register('${pluginName}', '${scriptPath}')`,
     "call denops#server#start()",
     ...(options.postlude ?? []),
@@ -93,7 +94,7 @@ export async function withDenops(
       "call",
       "denops#_internal#meta#get",
     ) as Meta;
-    const denops = await newDenopsImpl(meta, session, client, pluginName);
+    const denops = await newDenopsImpl(conf, meta, session, client, pluginName);
     // Workaround for unexpected "leaking async ops"
     // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -108,13 +109,14 @@ export async function withDenops(
 }
 
 async function newDenopsImpl(
+  conf: Config,
   meta: Meta,
   session: Session,
   client: Client,
   pluginName: string,
 ): Promise<Denops> {
   const url = path.toFileUrl(path.join(
-    DENOPS_PATH,
+    conf.denopsPath,
     "denops",
     "@denops-private",
     "impl.ts",
