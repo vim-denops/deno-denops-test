@@ -1,4 +1,4 @@
-import { NVIM_EXECUTABLE, VIM_EXECUTABLE } from "./conf.ts";
+import { getConfig } from "./conf.ts";
 
 /** Runner mode */
 export type RunMode = "vim" | "nvim";
@@ -46,15 +46,16 @@ export function isRunMode(mode: string): mode is RunMode {
 }
 
 function buildArgs(mode: RunMode): [string, string[]] {
+  const conf = getConfig();
   switch (mode) {
     case "vim":
       return [
-        VIM_EXECUTABLE,
+        conf.vimExecutable,
         ["-u", "NONE", "-i", "NONE", "-n", "-N", "-X", "-e", "-s"],
       ];
     case "nvim":
       return [
-        NVIM_EXECUTABLE,
+        conf.nvimExecutable,
         ["--clean", "--embed", "--headless", "-n"],
       ];
   }
