@@ -1,4 +1,5 @@
 import { is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
+import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
 import { getConfig } from "./conf.ts";
 
 /** Runner mode */
@@ -62,5 +63,7 @@ function buildArgs(mode: RunMode): [string, string[]] {
         conf.nvimExecutable,
         ["--clean", "--embed", "--headless", "-n"],
       ];
+    default:
+      unreachable(mode);
   }
 }
