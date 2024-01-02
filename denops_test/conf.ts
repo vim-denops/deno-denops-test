@@ -1,5 +1,4 @@
-import * as path from "https://deno.land/std@0.210.0/path/mod.ts";
-import { orElse } from "./or_else.ts";
+import { resolve } from "https://deno.land/std@0.210.0/path/mod.ts";
 
 let conf: Config | undefined;
 
@@ -10,20 +9,19 @@ export type Config = {
 };
 
 export function getConfig(): Config {
-  if (!conf) {
-    conf = {
-      denopsPath: path.resolve(orElse(get("DENOPS_PATH"), () => {
-        throw new Error(
-          "Environment variable 'DENOPS_TEST_DENOPS_PATH' is required",
-        );
-      })),
-      vimExecutable: get("VIM_EXECUTABLE") ?? "vim",
-      nvimExecutable: get("NVIM_EXECUTABLE") ?? "nvim",
-    };
+  if (conf) {
+    return conf;
   }
+  const denopsPath = Deno.env.get("DENOPS_TEST_DENOPS_PATH");
+  if (!denopsPath) {
+    throw new Error(
+      "Environment variable 'DENOPS_TEST_DENOPS_PATH' is required",
+    );
+  }
+  conf = {
+    denopsPath: resolve(denopsPath),
+    vimExecutable: Deno.env.get("DENOPS_TEST_VIM_EXECUTABLE") ?? "vim",
+    nvimExecutable: Deno.env.get("DENOPS_TEST_NVIM_EXECUTABLE") ?? "nvim",
+  };
   return conf;
-}
-
-function get(name: string): string | undefined {
-  return Deno.env.get(`DENOPS_TEST_${name}`);
 }
