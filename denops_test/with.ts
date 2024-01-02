@@ -2,7 +2,7 @@ import * as path from "https://deno.land/std@0.190.0/path/mod.ts";
 import {
   Client,
   Session,
-} from "https://deno.land/x/messagepack_rpc@v1.0.0/mod.ts#^";
+} from "https://deno.land/x/messagepack_rpc@v1.0.0/mod.ts";
 import type {
   Denops,
   Meta,

@@ -1,7 +1,7 @@
 import {
   readableStreamFromWorker,
   writableStreamFromWorker,
-} from "https://deno.land/x/workerio@v3.1.0/mod.ts#^";
+} from "https://deno.land/x/workerio@v3.1.0/mod.ts";
 import { orElse } from "./or_else.ts";
 
 const worker = self as unknown as Worker;
