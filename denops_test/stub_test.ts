@@ -1,8 +1,8 @@
 import {
   assertSpyCall,
   spy,
-} from "https://deno.land/std@0.190.0/testing/mock.ts";
-import { assertEquals } from "https://deno.land/std@0.190.0/testing/asserts.ts";
+} from "https://deno.land/std@0.210.0/testing/mock.ts";
+import { assertEquals } from "https://deno.land/std@0.210.0/assert/mod.ts";
 import { Denops } from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
 import { DenopsStub } from "./stub.ts";
 

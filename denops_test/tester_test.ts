@@ -2,7 +2,7 @@ import {
   assert,
   assertEquals,
   assertFalse,
-} from "https://deno.land/std@0.190.0/testing/asserts.ts";
+} from "https://deno.land/std@0.210.0/assert/mod.ts";
 import { test } from "./tester.ts";
 
 test({

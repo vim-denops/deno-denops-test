@@ -1,13 +1,21 @@
+import { is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
+import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
 import { getConfig } from "./conf.ts";
 
 /** Runner mode */
 export type RunMode = "vim" | "nvim";
 
 /** Runner option */
-export interface RunOptions
-  extends Omit<Deno.CommandOptions, "cmd" | "stdin" | "stdout" | "stderr"> {
-  verbose?: boolean;
-}
+export type RunOptions =
+  & Omit<Deno.CommandOptions, "cmd" | "stdin" | "stdout" | "stderr">
+  & {
+    verbose?: boolean;
+  };
+
+/**
+ * Check if the mode is valid `RunMode`
+ */
+export const isRunMode = is.LiteralOneOf(["vim", "nvim"] as const);
 
 /**
  * Runs the specified commands in the runner
@@ -32,31 +40,30 @@ export function run(
   return command.spawn();
 }
 
-/**
- * Check if the mode is valid `RunMode`
- */
-export function isRunMode(mode: string): mode is RunMode {
-  switch (mode) {
-    case "vim":
-    case "nvim":
-      return true;
-    default:
-      return false;
-  }
-}
-
 function buildArgs(mode: RunMode): [string, string[]] {
   const conf = getConfig();
   switch (mode) {
     case "vim":
       return [
         conf.vimExecutable,
-        ["-u", "NONE", "-i", "NONE", "-n", "-N", "-X", "-e", "-s"],
+        [
+          "-u",
+          "NONE", // Disable vimrc, plugins, defaults.vim
+          "-i",
+          "NONE", // Disable viminfo
+          "-n", // Disable swap file
+          "-N", // Disable compatible mode
+          "-X", // Disable xterm
+          "-e", // Start Vim in Ex mode
+          "-s", // Silent or batch mode
+        ],
       ];
     case "nvim":
       return [
         conf.nvimExecutable,
         ["--clean", "--embed", "--headless", "-n"],
       ];
+    default:
+      unreachable(mode);
   }
 }
