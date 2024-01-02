@@ -13,7 +13,7 @@ import { Config, getConfig } from "./conf.ts";
 const PLUGIN_NAME = "@denops-test";
 
 /** Options for `withDenops` function */
-export interface WithDenopsOptions {
+export type WithDenopsOptions = {
   /** Plugin name of test target */
   pluginName?: string;
   /** Print Vim messages (echomsg) */
@@ -22,7 +22,7 @@ export interface WithDenopsOptions {
   prelude?: string[];
   /** Vim commands to be executed after the start of Denops */
   postlude?: string[];
-}
+};
 
 /**
  * Function to be executed by passing a denops instance for testing to the specified function

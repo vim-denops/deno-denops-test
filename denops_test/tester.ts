@@ -7,7 +7,7 @@ import { withDenops } from "./with.ts";
 export type TestMode = RunMode | "any" | "all";
 
 /** Test definition used in `test` function */
-export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
+export type TestDefinition = Omit<Deno.TestDefinition, "fn"> & {
   fn: (denops: Denops, t: Deno.TestContext) => void | Promise<void>;
   /**
    * Test runner mode
@@ -25,7 +25,7 @@ export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
   prelude?: string[];
   /** Vim commands to be executed after the start of Denops */
   postlude?: string[];
-}
+};
 
 /**
  * Register a test for denops to be run when `deno test` is used.
