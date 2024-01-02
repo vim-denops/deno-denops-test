@@ -1,4 +1,6 @@
-import * as path from "https://deno.land/std@0.210.0/path/mod.ts";
+import { fromFileUrl } from "https://deno.land/std@0.210.0/path/mod.ts";
+import { deadline } from "https://deno.land/std@0.210.0/async/mod.ts";
+import { assert, is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
 import {
   Client,
   Session,
@@ -7,10 +9,16 @@ import type {
   Denops,
   Meta,
 } from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
+import { getConfig } from "./conf.ts";
 import { run, RunMode } from "./runner.ts";
-import { Config, getConfig } from "./conf.ts";
+import { DenopsImpl } from "./denops.ts";
+import { errorDeserializer, errorSerializer } from "./error.ts";
 
 const PLUGIN_NAME = "@denops-test";
+
+// Timeout for connecting to Vim/Neovim
+// It takes a long time to start Vim/Neovim on Windows so set a long timeout
+const CONNECT_TIMEOUT = 30000;
 
 /** Options for `withDenops` function */
 export type WithDenopsOptions = {
@@ -59,82 +67,66 @@ export async function withDenops(
   options: WithDenopsOptions = {},
 ) {
   const conf = getConfig();
-  const scriptPath = new URL("./plugin.ts", import.meta.url);
+  const name = options.pluginName ?? PLUGIN_NAME;
+  const plugin = fromFileUrl(new URL("./plugin.ts", import.meta.url));
+  const script = fromFileUrl(new URL("./with.vim", import.meta.url));
+  const commands = [
+    ...(options.prelude ?? []),
+    `source ${script.replace(/\s/g, "\\ ")}`,
+    `call DenopsTestStart('${conf.denopsPath}', '${name}', '${plugin}')`,
+    ...(options.postlude ?? []),
+  ];
   const listener = Deno.listen({
     hostname: "127.0.0.1",
     port: 0, // Automatically select free port
   });
-  const pluginName = options.pluginName ?? PLUGIN_NAME;
-  const cmds = [
-    ...(options.prelude ?? []),
-    "let g:denops#_test = 1",
-    `set runtimepath^=${conf.denopsPath}`,
-    `autocmd User DenopsReady call denops#plugin#register('${pluginName}', '${scriptPath}')`,
-    "call denops#server#start()",
-    ...(options.postlude ?? []),
-  ];
-  const proc = run(mode, cmds, {
+  const proc = run(mode, commands, {
     verbose: options.verbose,
     env: {
       "DENOPS_TEST_ADDRESS": JSON.stringify(listener.addr),
     },
   });
-  const conn = await listener.accept();
+  const conn = await deadline(listener.accept(), CONNECT_TIMEOUT);
   try {
-    const session = new Session(conn.readable, conn.writable);
+    const session = new Session(conn.readable, conn.writable, {
+      errorSerializer,
+    });
     session.onInvalidMessage = (message) => {
-      console.error("Unexpected message:", message);
+      console.error(`[denops-test] Unexpected message: ${message}`);
     };
-    session.onMessageError = (error, message) => {
-      console.error(`Unexpected error occured for message ${message}:`, error);
+    session.onMessageError = (err, message) => {
+      console.error(
+        `[denops-test] Unexpected error occured for message ${message}: ${err}`,
+      );
     };
     session.start();
-    const client = new Client(session);
+    const client = new Client(session, {
+      errorDeserializer,
+    });
     const meta = await client.call(
+      "invoke",
       "call",
-      "denops#_internal#meta#get",
+      ["denops#_internal#meta#get"],
     ) as Meta;
-    const denops = await newDenopsImpl(conf, meta, session, client, pluginName);
+    const denops = new DenopsImpl(name, meta, client);
+    session.dispatcher = {
+      dispatch: (name, args) => {
+        assert(name, is.String);
+        assert(args, is.Array);
+        return denops.dispatcher[name](...args);
+      },
+    };
     // Workaround for unexpected "leaking async ops"
     // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
     await new Promise((resolve) => setTimeout(resolve, 0));
     await main(denops);
     await session.shutdown();
   } finally {
-    proc.stdin?.close();
-    proc.kill();
-    await proc.status;
     listener.close();
+    proc.kill();
+    await Promise.all([
+      proc.stdin?.close(),
+      proc.output(),
+    ]);
   }
-}
-
-async function newDenopsImpl(
-  conf: Config,
-  meta: Meta,
-  session: Session,
-  client: Client,
-  pluginName: string,
-): Promise<Denops> {
-  const url = path.toFileUrl(path.join(
-    conf.denopsPath,
-    "denops",
-    "@denops-private",
-    "impl.ts",
-  ));
-  const { DenopsImpl } = await import(url.href);
-  return new DenopsImpl(pluginName, meta, {
-    get dispatcher() {
-      return session.dispatcher;
-    },
-    set dispatcher(dispatcher) {
-      session.dispatcher = dispatcher;
-    },
-    call(method: string, ...params: unknown[]): Promise<unknown> {
-      return client.call(method, ...params);
-    },
-    notify(method: string, ...params: unknown[]): Promise<void> {
-      client.notify(method, ...params);
-      return Promise.resolve();
-    },
-  });
 }
