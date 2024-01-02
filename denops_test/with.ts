@@ -1,4 +1,3 @@
-import { fromFileUrl } from "https://deno.land/std@0.210.0/path/mod.ts";
 import { deadline } from "https://deno.land/std@0.210.0/async/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
 import {
@@ -68,12 +67,19 @@ export async function withDenops(
 ) {
   const conf = getConfig();
   const name = options.pluginName ?? PLUGIN_NAME;
-  const plugin = fromFileUrl(new URL("./plugin.ts", import.meta.url));
-  const script = fromFileUrl(new URL("./with.vim", import.meta.url));
+  const plugin = new URL("./plugin.ts", import.meta.url);
   const commands = [
     ...(options.prelude ?? []),
-    `source ${script.replace(/\s/g, "\\ ")}`,
-    `call DenopsTestStart('${conf.denopsPath}', '${name}', '${plugin}')`,
+    "let g:denops#_test = 1",
+    `set runtimepath^=${conf.denopsPath.replace(/ /g, "\\ ")}`,
+    [
+      "try",
+      `  call denops#server#wait_async({ -> denops#plugin#load('${name}', '${plugin}') })`,
+      "catch /^Vim\\%((\\a\\+)\\)\\=:E117:/",
+      `  execute 'autocmd User DenopsReady call denops#plugin#register(''${name}'', ''${plugin}'')'`,
+      "endtry",
+    ].join(" | "),
+    "call denops#server#start()",
     ...(options.postlude ?? []),
   ];
   const listener = Deno.listen({
