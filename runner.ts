@@ -2,23 +2,33 @@ import { is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
 import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
 import { getConfig } from "./conf.ts";
 
-/** Runner mode */
+/**
+ * Represents the mode in which the runner operates.
+ */
 export type RunMode = "vim" | "nvim";
 
-/** Runner option */
-export type RunOptions =
-  & Omit<Deno.CommandOptions, "cmd" | "stdin" | "stdout" | "stderr">
-  & {
-    verbose?: boolean;
-  };
+/**
+ * Represents options for the runner.
+ */
+export interface RunOptions
+  extends Omit<Deno.CommandOptions, "cmd" | "stdin" | "stdout" | "stderr"> {
+  /**
+   * A flag indicating whether to enable verbose output.
+   */
+  verbose?: boolean;
+}
 
 /**
- * Check if the mode is valid `RunMode`
+ * Checks if the provided mode is a valid `RunMode`.
  */
 export const isRunMode = is.LiteralOneOf(["vim", "nvim"] as const);
 
 /**
- * Runs the specified commands in the runner
+ * Runs the specified commands in the runner.
+ *
+ * @param mode - The mode in which the runner operates (`vim` or `nvim`).
+ * @param cmds - An array of commands to run.
+ * @param options - Options for configuring the runner.
  */
 export function run(
   mode: RunMode,
