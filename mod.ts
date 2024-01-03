@@ -1,17 +1,37 @@
 /**
- * [Deno][deno] module for testing [denops.vim][denops.vim]. This module is assumed
- * to be used in unittests of denops plugin.
+ * A [Deno] module designed for testing [denops.vim]. This module is intended to be
+ * used in the unit tests of denops plugins.
  *
  * [deno]: https://deno.land/
  * [denops.vim]: https://github.com/vim-denops/denops.vim
  *
+ * > [!NOTE]
+ * >
+ * > To use the `test` function, an environment variable `DENOPS_TEST_DENOPS_PATH`
+ * > is required. Clone the [denops.vim] repository and set the path to this
+ * > environment variable.
+ * >
+ * > Additionally, the following environment variables are available to configure
+ * > the behavior of the `test` function:
+ * >
+ * > - `DENOPS_TEST_VIM_EXECUTABLE`: Path to the Vim executable (default: "vim")
+ * > - `DENOPS_TEST_NVIM_EXECUTABLE`: Path to the Neovim executable (default:
+ *   > "nvim")
+ *
+ * If you want to test denops plugins with a real Vim and/or Neovim process, use
+ * the `test` function to define a test case, as shown below:
+ *
  * ```typescript
- * import { assert, assertFalse } from "https://deno.land/std/testing/asserts.ts";
+ * import {
+ *   assert,
+ *   assertEquals,
+ *   assertFalse,
+ * } from "https://deno.land/std@0.210.0/assert/mod.ts";
  * import { test } from "./mod.ts";
  *
  * test(
  *   "vim",
- *   "test(mode:vim) start vim to test denops features",
+ *   "Start Vim to test denops features",
  *   async (denops) => {
  *     assertFalse(await denops.call("has", "nvim"));
  *   },
@@ -19,18 +39,35 @@
  *
  * test({
  *   mode: "nvim",
- *   name: "test(mode:nvim) start nvim to test denops features",
+ *   name: "Start Neovim to test denops features",
  *   fn: async (denops) => {
  *     assert(await denops.call("has", "nvim"));
  *   },
  * });
+ *
+ * test({
+ *   mode: "all",
+ *   name: "Start Vim and Neovim to test denops features",
+ *   fn: async (denops) => {
+ *     assertEquals(await denops.call("abs", -4), 4);
+ *   },
+ * });
+ *
+ * test({
+ *   mode: "any",
+ *   name: "Start Vim or Neovim to test denops features",
+ *   fn: async (denops) => {
+ *     assertEquals(await denops.call("abs", -4), 4);
+ *   },
+ * });
  * ```
  *
- * Use `DenopsStub` class to create a stub instance of `Denops` interface
- * if no real Vim/Neovim behavior is required for the tests.
+ * If you want to test denops plugins without a real Vim and/or Neovim process, use
+ * the `DenopsStub` class to create a stub instance of the `Denops` interface, as
+ * shown below:
  *
  * ```typescript
- * import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+ * import { assertEquals } from "https://deno.land/std@0.210.0/assert/mod.ts";
  * import { DenopsStub } from "./mod.ts";
  *
  * Deno.test("denops.call", async () => {

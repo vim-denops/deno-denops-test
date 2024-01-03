@@ -16,12 +16,12 @@ import { errorDeserializer, errorSerializer } from "./error.ts";
 const PLUGIN_NAME = "@denops-test";
 
 // Timeout for connecting to Vim/Neovim
-// It takes a long time to start Vim/Neovim on Windows so set a long timeout
+// It takes a long time to start Vim/Neovim on Windows, so set a long timeout
 const CONNECT_TIMEOUT = 30000;
 
-/** Options for `withDenops` function */
-export type WithDenopsOptions = {
-  /** Plugin name of test target */
+/** Options for the `withDenops` function */
+export interface WithDenopsOptions {
+  /** Plugin name of the test target */
   pluginName?: string;
   /** Print Vim messages (echomsg) */
   verbose?: boolean;
@@ -29,10 +29,10 @@ export type WithDenopsOptions = {
   prelude?: string[];
   /** Vim commands to be executed after the start of Denops */
   postlude?: string[];
-};
+}
 
 /**
- * Function to be executed by passing a denops instance for testing to the specified function
+ * Function to be executed by passing a Denops instance for testing to the specified function
  *
  * To use this function, the environment variable `DENOPS_TEST_DENOPS_PATH` must be set to the
  * local path to the `denops.vim` repository.
@@ -41,19 +41,19 @@ export type WithDenopsOptions = {
  * allow you to change the Vim/Neovim execution command (default is `vim` and `nvim` respectively).
  *
  * Note that this is a time-consuming process, especially on Windows, since this function
- * internally spawns Vim/Neovim sub-process, which performs the tests.
+ * internally spawns a Vim/Neovim sub-process, which performs the tests.
  *
  * ```ts
- * import { assert, assertFalse } from "https://deno.land/std/testing/asserts.ts";
+ * import { assert, assertFalse } from "https://deno.land/std@0.210.0/assert/mod.ts";
  * import { withDenops } from "./with.ts";
  *
- * Deno.test("Test denops (vim)", async () => {
+ * Deno.test("Test Denops (Vim)", async () => {
  *   await withDenops("vim", async (denops) => {
        assertFalse(await denops.call("has", "nvim"));
  *   });
  * });
  *
- * Deno.test("Test denops (nvim)", async () => {
+ * Deno.test("Test Denops (Neovim)", async () => {
  *   await withDenops("nvim", async (denops) => {
        assert(await denops.call("has", "nvim"));
  *   });
@@ -84,7 +84,7 @@ export async function withDenops(
   ];
   const listener = Deno.listen({
     hostname: "127.0.0.1",
-    port: 0, // Automatically select free port
+    port: 0, // Automatically select a free port
   });
   const proc = run(mode, commands, {
     verbose: options.verbose,
@@ -102,7 +102,7 @@ export async function withDenops(
     };
     session.onMessageError = (err, message) => {
       console.error(
-        `[denops-test] Unexpected error occured for message ${message}: ${err}`,
+        `[denops-test] Unexpected error occurred for message ${message}: ${err}`,
       );
     };
     session.start();
@@ -122,7 +122,7 @@ export async function withDenops(
         return denops.dispatcher[name](...args);
       },
     };
-    // Workaround for unexpected "leaking async ops"
+    // Workaround for an unexpected "leaking async ops"
     // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
     await new Promise((resolve) => setTimeout(resolve, 0));
     await main(denops);
