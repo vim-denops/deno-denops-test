@@ -3,7 +3,7 @@ import type {
   Denops,
   Dispatcher,
   Meta,
-} from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
+} from "https://deno.land/x/denops_core@v6.0.2/mod.ts";
 import { Client } from "https://deno.land/x/messagepack_rpc@v2.0.3/mod.ts";
 
 export class DenopsImpl implements Denops {

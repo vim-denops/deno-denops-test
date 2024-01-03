@@ -7,7 +7,7 @@ import {
 import type {
   Denops,
   Meta,
-} from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
+} from "https://deno.land/x/denops_core@v6.0.2/mod.ts";
 import { getConfig } from "./conf.ts";
 import { run, RunMode } from "./runner.ts";
 import { DenopsImpl } from "./denops.ts";

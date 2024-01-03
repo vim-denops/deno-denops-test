@@ -1,5 +1,5 @@
 import { sample } from "https://deno.land/std@0.210.0/collections/sample.ts";
-import type { Denops } from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_core@v6.0.2/mod.ts";
 import type { RunMode } from "./runner.ts";
 import { withDenops } from "./with.ts";
 

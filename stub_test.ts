@@ -3,7 +3,7 @@ import {
   spy,
 } from "https://deno.land/std@0.210.0/testing/mock.ts";
 import { assertEquals } from "https://deno.land/std@0.210.0/assert/mod.ts";
-import { Denops } from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
+import { Denops } from "https://deno.land/x/denops_core@v6.0.2/mod.ts";
 import { DenopsStub } from "./stub.ts";
 
 Deno.test("`DenopsStub`", async (t) => {

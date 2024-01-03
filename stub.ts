@@ -3,7 +3,7 @@ import {
   Denops,
   Dispatcher,
   Meta,
-} from "https://deno.land/x/denops_core@v5.0.0/mod.ts";
+} from "https://deno.land/x/denops_core@v6.0.2/mod.ts";
 
 /**
  * Represents a stubber object for `Denops`.
