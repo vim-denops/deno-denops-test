@@ -46,7 +46,7 @@ export interface TestDefinition extends Omit<Deno.TestDefinition, "fn"> {
  *
  * ```ts
  * import { assert, assertFalse } from "https://deno.land/std@0.210.0/assert/mod.ts";
- * import { test } from "./tester.ts";
+ * import { test } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
  *
  * test("vim", "Test with Vim", async (denops) => {
  *   assertFalse(await denops.call("has", "nvim"));
@@ -75,7 +75,7 @@ export function test(
  *
  * ```ts
  * import { assert, assertFalse } from "https://deno.land/std@0.210.0/assert/mod.ts";
- * import { test } from "./tester.ts";
+ * import { test } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
  *
  * test({
  *   mode: "nvim",

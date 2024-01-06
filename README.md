@@ -33,7 +33,7 @@ import {
   assertEquals,
   assertFalse,
 } from "https://deno.land/std@0.210.0/assert/mod.ts";
-import { test } from "./mod.ts";
+import { test } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
 
 test(
   "vim",
@@ -74,7 +74,7 @@ shown below:
 
 ```typescript
 import { assertEquals } from "https://deno.land/std@0.210.0/assert/mod.ts";
-import { DenopsStub } from "./mod.ts";
+import { DenopsStub } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
 
 Deno.test("denops.call", async () => {
   const denops = new DenopsStub({
