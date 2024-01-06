@@ -1,6 +1,6 @@
 import { is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
 import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
-import { getConfig } from "./conf.ts";
+import { Config, getConfig } from "./conf.ts";
 
 /**
  * Represents the mode in which the runner operates.
@@ -35,23 +35,24 @@ export function run(
   cmds: string[],
   options: RunOptions = {},
 ): Deno.ChildProcess {
-  const [cmd, args] = buildArgs(mode);
+  const conf = getConfig();
+  const verbose = options.verbose ?? conf.verbose;
+  const [cmd, args] = buildArgs(conf, mode);
   args.unshift(...cmds.flatMap((c) => ["-c", c]));
-  if (options.verbose) {
+  if (verbose) {
     args.unshift("--cmd", "redir >> /dev/stdout");
   }
   const command = new Deno.Command(cmd, {
     args,
     env: options.env,
     stdin: "piped",
-    stdout: options.verbose ? "inherit" : "null",
-    stderr: options.verbose ? "inherit" : "null",
+    stdout: verbose ? "inherit" : "null",
+    stderr: verbose ? "inherit" : "null",
   });
   return command.spawn();
 }
 
-function buildArgs(mode: RunMode): [string, string[]] {
-  const conf = getConfig();
+function buildArgs(conf: Config, mode: RunMode): [string, string[]] {
   switch (mode) {
     case "vim":
       return [
