@@ -23,6 +23,12 @@ export interface Config {
    * It refers to the environment variable 'DENOPS_TEST_NVIM_EXECUTABLE'.
    */
   nvimExecutable: string;
+
+  /**
+   * Print Vim messages (echomsg).
+   * It refers to the environment variable 'DENOPS_TEST_VERBOSE'.
+   */
+  verbose: boolean;
 }
 
 /**
@@ -36,6 +42,7 @@ export interface Config {
  * - `DENOPS_TEST_DENOPS_PATH`: Local path to the denops.vim repository (required)
  * - `DENOPS_TEST_VIM_EXECUTABLE`: Path to the Vim executable (default: "vim")
  * - `DENOPS_TEST_NVIM_EXECUTABLE`: Path to the Neovim executable (default: "nvim")
+ * - `DENOPS_TEST_VERBOSE`: `1` or `true` to print Vim messages (echomsg)
  *
  * It throws an error if the environment variable 'DENOPS_TEST_DENOPS_PATH' is
  * not set.
@@ -50,10 +57,12 @@ export function getConfig(): Config {
       "Environment variable 'DENOPS_TEST_DENOPS_PATH' is required",
     );
   }
+  const verbose = Deno.env.get("DENOPS_TEST_VERBOSE");
   conf = {
     denopsPath: resolve(denopsPath),
     vimExecutable: Deno.env.get("DENOPS_TEST_VIM_EXECUTABLE") ?? "vim",
     nvimExecutable: Deno.env.get("DENOPS_TEST_NVIM_EXECUTABLE") ?? "nvim",
+    verbose: verbose === "1" || verbose === "true",
   };
   return conf;
 }
