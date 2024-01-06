@@ -45,7 +45,7 @@ export interface WithDenopsOptions {
  *
  * ```ts
  * import { assert, assertFalse } from "https://deno.land/std@0.210.0/assert/mod.ts";
- * import { withDenops } from "./with.ts";
+ * import { withDenops } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
  *
  * Deno.test("Test Denops (Vim)", async () => {
  *   await withDenops("vim", async (denops) => {
