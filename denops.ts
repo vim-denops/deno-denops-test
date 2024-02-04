@@ -57,6 +57,6 @@ export class DenopsImpl implements Denops {
   }
 
   dispatch(name: string, fn: string, ...args: unknown[]): Promise<unknown> {
-    return this.#client.call("invoke", "dispatch", [name, fn, args]);
+    return this.#client.call("invoke", "dispatch", [name, fn, ...args]);
   }
 }
