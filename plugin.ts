@@ -1,13 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_core@v6.0.2/mod.ts";
-import {
-  assert,
-  ensure,
-  is,
-} from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
-import {
-  Client,
-  Session,
-} from "https://deno.land/x/messagepack_rpc@v2.0.3/mod.ts";
+import type { Denops } from "jsr:@denops/core@^6.0.6";
+import { assert, ensure, is } from "jsr:@core/unknownutil@3.17.3";
+import { Client, Session } from "jsr:@lambdalisue/messagepack-rpc@^2.1.1";
 import { errorDeserializer, errorSerializer } from "./error.ts";
 
 export async function main(denops: Denops): Promise<void> {

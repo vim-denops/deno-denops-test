@@ -1,9 +1,9 @@
-import {
+import type {
   Context,
   Denops,
   Dispatcher,
   Meta,
-} from "https://deno.land/x/denops_core@v6.0.2/mod.ts";
+} from "jsr:@denops/core@^6.0.6";
 
 /**
  * Represents a stubber object for `Denops`.

@@ -1,6 +1,6 @@
-import { is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
-import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
-import { Config, getConfig } from "./conf.ts";
+import { is } from "jsr:@core/unknownutil@^3.17.3";
+import { unreachable } from "jsr:@lambdalisue/errorutil@^1.0.0";
+import { type Config, getConfig } from "./conf.ts";
 
 /**
  * Represents the mode in which the runner operates.

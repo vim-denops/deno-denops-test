@@ -1,6 +1,9 @@
 {
+  "name": "@denops/test",
+  "version": "0.0.0",
+  "exports": "./mod.ts",
   "imports": {
-    "https://deno.land/x/denops_test@$MODULE_VERSION/": "./"
+    "jsr:@denops/test": "./mod.ts"
   },
   "tasks": {
     "check": "deno check **/*.ts",

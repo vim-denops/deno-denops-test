@@ -1,7 +1,4 @@
-import {
-  assert,
-  assertFalse,
-} from "https://deno.land/std@0.210.0/assert/mod.ts";
+import { assert, assertFalse } from "jsr:@std/assert@^0.222.1";
 import { withDenops } from "./with.ts";
 
 Deno.test(

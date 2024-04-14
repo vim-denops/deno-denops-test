@@ -1,8 +1,4 @@
-import {
-  assert,
-  assertEquals,
-  assertFalse,
-} from "https://deno.land/std@0.210.0/assert/mod.ts";
+import { assert, assertEquals, assertFalse } from "jsr:@std/assert@^0.222.1";
 import { test } from "./tester.ts";
 
 test({

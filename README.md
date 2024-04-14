@@ -1,8 +1,9 @@
 # 📝 denops_test
 
-[![Test](https://github.com/vim-denops/deno-denops-test/actions/workflows/test.yml/badge.svg)](https://github.com/vim-denops/deno-denops-test/actions/workflows/test.yml)
+[![jsr](https://jsr.io/badges/@denops/test)](https://jsr.io/@denops/test)
+[![denoland](https://img.shields.io/github/v/release/vim-denops/deno-denops-test?logo=deno&label=denoland)](https://deno.land/x/denops_test)
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/denops_test/mod.ts)
-[![deno land](http://img.shields.io/badge/available%20on-deno.land/x/denops__test-lightgrey.svg?logo=deno)](https://deno.land/x/denops_test)
+[![test](https://github.com/vim-denops/deno-denops-test/actions/workflows/test.yml/badge.svg)](https://github.com/vim-denops/deno-denops-test/actions/workflows/test.yml)
 [![codecov](https://codecov.io/github/vim-denops/deno-denops-test/branch/main/graph/badge.svg?token=X9O5XB4O1S)](https://codecov.io/github/vim-denops/deno-denops-test)
 
 A [Deno] module designed for testing [denops.vim]. This module is intended to be
@@ -29,12 +30,8 @@ If you want to test denops plugins with a real Vim and/or Neovim process, use
 the `test` function to define a test case, as shown below:
 
 ```typescript
-import {
-  assert,
-  assertEquals,
-  assertFalse,
-} from "https://deno.land/std@0.210.0/assert/mod.ts";
-import { test } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
+import { assert, assertEquals, assertFalse } from "jsr:@std/assert";
+import { test } from "jsr:@denops/test";
 
 test(
   "vim",
@@ -74,8 +71,8 @@ the `DenopsStub` class to create a stub instance of the `Denops` interface, as
 shown below:
 
 ```typescript
-import { assertEquals } from "https://deno.land/std@0.210.0/assert/mod.ts";
-import { DenopsStub } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
+import { assertEquals } from "jsr:@std/assert";
+import { DenopsStub } from "jsr:@denops/test";
 
 Deno.test("denops.call", async () => {
   const denops = new DenopsStub({

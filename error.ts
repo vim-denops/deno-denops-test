@@ -1,10 +1,10 @@
-import { is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
+import { is } from "jsr:@core/unknownutil@^3.17.3";
 import {
   fromErrorObject,
   isErrorObject,
   toErrorObject,
   tryOr,
-} from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
+} from "jsr:@lambdalisue/errorutil@^1.0.0";
 
 export function errorSerializer(err: unknown): unknown {
   if (err instanceof Error) {
