@@ -38,7 +38,7 @@ export function run(
   const conf = getConfig();
   const verbose = options.verbose ?? conf.verbose;
   const [cmd, args] = buildArgs(conf, mode);
-  args.unshift(...cmds.flatMap((c) => ["-c", c]));
+  args.push(...cmds.flatMap((c) => ["-c", c]));
   if (verbose) {
     args.unshift("--cmd", "redir >> /dev/stdout");
   }
@@ -66,7 +66,9 @@ function buildArgs(conf: Config, mode: RunMode): [string, string[]] {
           "-N", // Disable compatible mode
           "-X", // Disable xterm
           "-e", // Start Vim in Ex mode
-          "-s", // Silent or batch mode
+          "-s", // Silent or batch mode ("-e" is required before)
+          "-c",
+          "visual", // Go to Normal mode
         ],
       ];
     case "nvim":
