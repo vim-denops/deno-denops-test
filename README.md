@@ -24,6 +24,8 @@ used in the unit tests of denops plugins.
 > - `DENOPS_TEST_NVIM_EXECUTABLE`: Path to the Neovim executable (default:
 >   "nvim")
 > - `DENOPS_TEST_VERBOSE`: `1` or `true` to print Vim messages (echomsg)
+> - `DENOPS_TEST_CONNECT_TIMEOUT`: Timeout [ms] for connecting to Vim/Neovim
+>   (default: 30000)
 
 If you want to test denops plugins with a real Vim and/or Neovim process, use
 the `test` function to define a test case, as shown below:
