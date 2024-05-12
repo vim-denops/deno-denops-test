@@ -87,6 +87,10 @@ jobs:
           ${DENOPS_TEST_NVIM} --version
         env:
           DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
+      - name: Perform pre-cache
+        run: |
+          deno cache ../denops.vim/denops/@denops-private/mod.ts ./mod.ts
+        working-directory: ./repo
       - name: Test
         run: deno task test:coverage
         env:
