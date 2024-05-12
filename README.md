@@ -36,13 +36,9 @@ import {
 } from "https://deno.land/std@0.210.0/assert/mod.ts";
 import { test } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
 
-test(
-  "vim",
-  "Start Vim to test denops features",
-  async (denops) => {
-    assertFalse(await denops.call("has", "nvim"));
-  },
-);
+test("vim", "Start Vim to test denops features", async (denops) => {
+  assertFalse(await denops.call("has", "nvim"));
+});
 
 test({
   mode: "nvim",
@@ -85,6 +81,79 @@ Deno.test("denops.call", async () => {
   });
   assertEquals(await denops.call("foo", "bar"), ["foo", "bar"]);
 });
+```
+
+## GitHub Action
+
+Copy and modify the following GitHub Workflow to run tests in GitHub Action
+
+```yaml
+# Use 'bash' as default shell even on Windows
+defaults:
+  run:
+    shell: bash --noprofile --norc -eo pipefail {0}
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        runner:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
+        deno_version:
+          - "1.38.x"
+          - "1.x"
+        host_version:
+          - vim: "v9.0.2189"
+            nvim: "v0.9.4"
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - run: git config --global core.autocrlf false
+        if: runner.os == 'Windows'
+
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ matrix.deno_version }}
+
+      - name: Get denops
+        run: |
+          git clone https://github.com/vim-denops/denops.vim /tmp/denops.vim
+          echo "DENOPS_TEST_DENOPS_PATH=/tmp/denops.vim" >> "$GITHUB_ENV"
+
+      - uses: rhysd/action-setup-vim@v1
+        id: vim
+        with:
+          version: ${{ matrix.host_version.vim }}
+
+      - uses: rhysd/action-setup-vim@v1
+        id: nvim
+        with:
+          neovim: true
+          version: ${{ matrix.host_version.nvim }}
+
+      - name: Export executables
+        run: |
+          echo "DENOPS_TEST_VIM_EXECUTABLE=${{ steps.vim.outputs.executable }}" >> "$GITHUB_ENV"
+          echo "DENOPS_TEST_NVIM_EXECUTABLE=${{ steps.nvim.outputs.executable }}" >> "$GITHUB_ENV"
+
+      - name: Check versions
+        run: |
+          deno --version
+          ${DENOPS_TEST_VIM_EXECUTABLE} --version
+          ${DENOPS_TEST_NVIM_EXECUTABLE} --version
+
+      - name: Perform pre-cache
+        run: |
+          deno cache ${DENOPS_TEST_DENOPS_PATH}/denops/@denops-private/mod.ts
+          deno cache ./denops/your_plugin/main.ts
+
+      - name: Run tests
+        run: deno test -A
 ```
 
 ## License
