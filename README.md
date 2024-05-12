@@ -31,12 +31,8 @@ If you want to test denops plugins with a real Vim and/or Neovim process, use
 the `test` function to define a test case, as shown below:
 
 ```typescript
-import {
-  assert,
-  assertEquals,
-  assertFalse,
-} from "https://deno.land/std@0.210.0/assert/mod.ts";
-import { test } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
+import { assert, assertEquals, assertFalse } from "jsr:@std/assert";
+import { test } from "jsr:@denops/test";
 
 test("vim", "Start Vim to test denops features", async (denops) => {
   assertFalse(await denops.call("has", "nvim"));
@@ -72,8 +68,8 @@ the `DenopsStub` class to create a stub instance of the `Denops` interface, as
 shown below:
 
 ```typescript
-import { assertEquals } from "https://deno.land/std@0.210.0/assert/mod.ts";
-import { DenopsStub } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
+import { assertEquals } from "jsr:@std/assert";
+import { DenopsStub } from "jsr:@denops/test";
 
 Deno.test("denops.call", async () => {
   const denops = new DenopsStub({
@@ -157,6 +153,10 @@ jobs:
       - name: Run tests
         run: deno test -A
 ```
+
+## For developers
+
+This library may be called from denops itself so import map is not available.
 
 ## License
 

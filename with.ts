@@ -1,13 +1,7 @@
-import { deadline } from "https://deno.land/std@0.210.0/async/mod.ts";
-import { assert, is } from "https://deno.land/x/unknownutil@v3.11.0/mod.ts";
-import {
-  Client,
-  Session,
-} from "https://deno.land/x/messagepack_rpc@v2.0.3/mod.ts";
-import type {
-  Denops,
-  Meta,
-} from "https://deno.land/x/denops_core@v6.0.2/mod.ts";
+import { deadline } from "jsr:@std/async@0.224.0/deadline";
+import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { Client, Session } from "jsr:@lambdalisue/messagepack-rpc@2.1.1";
+import type { Denops, Meta } from "jsr:@denops/core@6.0.6";
 import { getConfig } from "./conf.ts";
 import { run, RunMode } from "./runner.ts";
 import { DenopsImpl } from "./denops.ts";
@@ -46,8 +40,8 @@ export interface WithDenopsOptions {
  * internally spawns a Vim/Neovim sub-process, which performs the tests.
  *
  * ```ts
- * import { assert, assertFalse } from "https://deno.land/std@0.210.0/assert/mod.ts";
- * import { withDenops } from "https://deno.land/x/denops_test@$MODULE_VERSION/mod.ts";
+ * import { assert, assertFalse } from "jsr:@std/assert";
+ * import { withDenops } from "jsr:@denops/test";
  *
  * Deno.test("Test Denops (Vim)", async () => {
  *   await withDenops("vim", async (denops) => {

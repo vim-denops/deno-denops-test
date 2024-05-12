@@ -1,4 +1,12 @@
 {
+  "name": "@denops/test",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./stub": "./stub.ts",
+    "./tester": "./tester.ts",
+    "./with": "./with.ts"
+  },
   "tasks": {
     "check": "deno check **/*.ts",
     "test": "deno test -A --doc --parallel --shuffle",
@@ -8,6 +16,6 @@
     "update:commit": "deno task -q update --commit --pre-commit=fmt,lint"
   },
   "imports": {
-    "https://deno.land/x/denops_test@$MODULE_VERSION/": "./"
+    "jsr:@denops/test": "./mod.ts"
   }
 }
