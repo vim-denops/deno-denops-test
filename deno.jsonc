@@ -1,13 +1,13 @@
 {
-  "lock": false,
-  "imports": {
-    "https://deno.land/x/denops_test@$MODULE_VERSION/": "./"
-  },
   "tasks": {
-    "test": "deno test -A --doc --parallel --shuffle --coverage=.coverage",
-    "check": "deno check $(find . -name '*.ts')",
+    "check": "deno check **/*.ts",
+    "test": "deno test -A --doc --parallel --shuffle",
+    "test:coverage": "deno task test --coverage=.coverage",
     "coverage": "deno coverage .coverage",
     "upgrade": "deno run -q -A https://deno.land/x/molt@0.14.2/cli.ts ./**/*.ts",
     "upgrade:commit": "deno task -q upgrade --commit --prefix :package: --pre-commit=fmt"
+  },
+  "imports": {
+    "https://deno.land/x/denops_test@$MODULE_VERSION/": "./"
   }
 }
