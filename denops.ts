@@ -24,17 +24,8 @@ export class DenopsImpl implements Denops {
     return this.#client.call("invoke", "redraw", [force]) as Promise<void>;
   }
 
-  async call(fn: string, ...args: unknown[]): Promise<unknown> {
-    try {
-      return await this.#client.call("invoke", "call", [fn, ...args]);
-    } catch (err) {
-      // Denops v5 or earlier may throws an error as string in Neovim
-      // so convert the error into an Error instance
-      if (typeof err === "string") {
-        throw new Error(err);
-      }
-      throw err;
-    }
+  call(fn: string, ...args: unknown[]): Promise<unknown> {
+    return this.#client.call("invoke", "call", [fn, ...args]);
   }
 
   batch(
