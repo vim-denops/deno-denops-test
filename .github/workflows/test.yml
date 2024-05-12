@@ -1,8 +1,6 @@
 name: Test
 
 on:
-  schedule:
-    - cron: "0 7 * * 0"
   push:
     branches:
       - main
@@ -10,8 +8,9 @@ on:
     paths:
       - "**.md"
       - "**.ts"
+      - "deno.jsonc"
       - ".github/workflows/test.yml"
-      - "Makefile"
+  workflow_dispatch:
 
 defaults:
   run:
@@ -48,13 +47,12 @@ jobs:
           - macos-latest
           - ubuntu-latest
         version:
-          - "1.32.x"
+          - "1.38.x"
           - "1.x"
         host_version:
-          - vim: "v9.0.1499"
-            nvim: "v0.8.0"
+          - vim: "v9.0.2189"
+            nvim: "v0.9.4"
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 15
     steps:
       - run: git config --global core.autocrlf false
         if: runner.os == 'Windows'
@@ -89,17 +87,23 @@ jobs:
           ${DENOPS_TEST_NVIM} --version
         env:
           DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
+      - name: Perform pre-cache
+        run: |
+          deno cache ../denops.vim/denops/@denops-private/mod.ts ./mod.ts
+        working-directory: ./repo
       - name: Test
-        run: deno task test
+        run: deno task test:coverage
         env:
           DENOPS_TEST_DENOPS_PATH: "../denops.vim"
           DENOPS_TEST_VIM_EXECUTABLE: ${{ steps.vim.outputs.executable }}
           DENOPS_TEST_NVIM_EXECUTABLE: ${{ steps.nvim.outputs.executable }}
         working-directory: ./repo
+        timeout-minutes: 15
       - run: |
-          deno coverage --unstable .coverage --lcov > coverage.lcov
+          deno task coverage --lcov > coverage.lcov
         working-directory: ./repo
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           os: ${{ runner.os }}
           files: ./coverage.lcov
+          token: ${{ secrets.CODECOV_TOKEN }}
