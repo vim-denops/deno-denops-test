@@ -1,8 +1,6 @@
 name: Test
 
 on:
-  schedule:
-    - cron: "0 7 * * 0"
   push:
     branches:
       - main
@@ -10,8 +8,9 @@ on:
     paths:
       - "**.md"
       - "**.ts"
+      - "deno.jsonc"
       - ".github/workflows/test.yml"
-      - "Makefile"
+  workflow_dispatch:
 
 defaults:
   run:
