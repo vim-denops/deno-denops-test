@@ -1,4 +1,9 @@
-import { assert, assertEquals, assertFalse } from "jsr:@std/assert@0.225.1";
+import {
+  assert,
+  assertEquals,
+  assertFalse,
+  assertThrows,
+} from "jsr:@std/assert@0.225.1";
 import { test } from "./tester.ts";
 
 test({
@@ -105,4 +110,60 @@ test({
       );
     });
   },
+});
+
+Deno.test("test() throws if 'mode' option is empty", () => {
+  assertThrows(
+    () => {
+      test({
+        mode: "" as "vim",
+        name: "name",
+        fn: () => {},
+      });
+    },
+    Error,
+    "'mode' attribute is required",
+  );
+});
+
+Deno.test("test() throws if 'mode' option is invalid", () => {
+  assertThrows(
+    () => {
+      test({
+        mode: "foo" as "vim",
+        name: "name",
+        fn: () => {},
+      });
+    },
+    Error,
+    "'mode' attribute is invalid",
+  );
+});
+
+Deno.test("test() throws if 'name' option is empty", () => {
+  assertThrows(
+    () => {
+      test({
+        mode: "vim",
+        name: "",
+        fn: () => {},
+      });
+    },
+    Error,
+    "'name' attribute is required",
+  );
+});
+
+Deno.test("test() throws if 'fn' option is empty", () => {
+  assertThrows(
+    () => {
+      test({
+        mode: "vim",
+        name: "name",
+        fn: undefined as unknown as () => void,
+      });
+    },
+    Error,
+    "'fn' attribute is required",
+  );
 });

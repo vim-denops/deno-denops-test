@@ -138,14 +138,6 @@ export async function withDenops(
     session.start();
     try {
       const denops = await createDenops(session);
-
-      // Workaround for an unexpected "leaking async ops"
-      // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
-      // Maybe fixed in v1.41.0
-      // https://github.com/denoland/deno/pull/22413
-      // TODO: Remove this workaround when Deno minimum version changes to v1.41.0 or higher
-      await new Promise((resolve) => setTimeout(resolve, 0));
-
       await main(denops);
     } finally {
       try {
