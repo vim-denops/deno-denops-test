@@ -53,7 +53,6 @@ jobs:
           - vim: "v9.0.2189"
             nvim: "v0.9.4"
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 15
     steps:
       - run: git config --global core.autocrlf false
         if: runner.os == 'Windows'
@@ -95,6 +94,7 @@ jobs:
           DENOPS_TEST_VIM_EXECUTABLE: ${{ steps.vim.outputs.executable }}
           DENOPS_TEST_NVIM_EXECUTABLE: ${{ steps.nvim.outputs.executable }}
         working-directory: ./repo
+        timeout-minutes: 15
       - run: |
           deno task coverage --lcov > coverage.lcov
         working-directory: ./repo
