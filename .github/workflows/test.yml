@@ -89,14 +89,14 @@ jobs:
         env:
           DENOPS_TEST_NVIM: ${{ steps.nvim.outputs.executable }}
       - name: Test
-        run: deno task test
+        run: deno task test:coverage
         env:
           DENOPS_TEST_DENOPS_PATH: "../denops.vim"
           DENOPS_TEST_VIM_EXECUTABLE: ${{ steps.vim.outputs.executable }}
           DENOPS_TEST_NVIM_EXECUTABLE: ${{ steps.nvim.outputs.executable }}
         working-directory: ./repo
       - run: |
-          deno coverage --unstable .coverage --lcov > coverage.lcov
+          deno task coverage --lcov > coverage.lcov
         working-directory: ./repo
       - uses: codecov/codecov-action@v4
         with:
