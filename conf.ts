@@ -79,3 +79,13 @@ export function getConfig(): Config {
   };
   return conf;
 }
+
+/** @internal for test */
+function resetConfig(newConf?: Config): void {
+  conf = newConf;
+}
+
+/** @internal */
+export const _internal = {
+  resetConfig,
+};
