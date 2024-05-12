@@ -29,6 +29,12 @@ export interface Config {
    * It refers to the environment variable 'DENOPS_TEST_VERBOSE'.
    */
   verbose: boolean;
+
+  /**
+   * Timeout for connecting to Vim/Neovim.
+   * It refers to the environment variable 'DENOPS_TEST_CONNECT_TIMEOUT'.
+   */
+  connectTimeout?: number;
 }
 
 /**
@@ -43,6 +49,7 @@ export interface Config {
  * - `DENOPS_TEST_VIM_EXECUTABLE`: Path to the Vim executable (default: "vim")
  * - `DENOPS_TEST_NVIM_EXECUTABLE`: Path to the Neovim executable (default: "nvim")
  * - `DENOPS_TEST_VERBOSE`: `1` or `true` to print Vim messages (echomsg)
+ * - `DENOPS_TEST_CONNECT_TIMEOUT`: Timeout [ms] for connecting to Vim/Neovim (default: 30000)
  *
  * It throws an error if the environment variable 'DENOPS_TEST_DENOPS_PATH' is
  * not set.
@@ -58,11 +65,17 @@ export function getConfig(): Config {
     );
   }
   const verbose = Deno.env.get("DENOPS_TEST_VERBOSE");
+  const connectTimeout = Number.parseInt(
+    Deno.env.get("DENOPS_TEST_CONNECT_TIMEOUT") ?? "",
+  );
   conf = {
     denopsPath: resolve(denopsPath),
     vimExecutable: Deno.env.get("DENOPS_TEST_VIM_EXECUTABLE") ?? "vim",
     nvimExecutable: Deno.env.get("DENOPS_TEST_NVIM_EXECUTABLE") ?? "nvim",
     verbose: verbose === "1" || verbose === "true",
+    connectTimeout: Number.isNaN(connectTimeout) || connectTimeout <= 0
+      ? undefined
+      : connectTimeout,
   };
   return conf;
 }

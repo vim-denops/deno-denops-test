@@ -29,6 +29,8 @@ export interface WithDenopsOptions {
   prelude?: string[];
   /** Vim commands to be executed after the start of Denops */
   postlude?: string[];
+  /** Timeout for connecting to Vim/Neovim */
+  connectTimeout?: number;
 }
 
 /**
@@ -66,34 +68,44 @@ export async function withDenops(
   options: WithDenopsOptions = {},
 ) {
   const conf = getConfig();
-  const name = options.pluginName ?? PLUGIN_NAME;
+  const {
+    pluginName = PLUGIN_NAME,
+    verbose = conf.verbose,
+    prelude = [],
+    postlude = [],
+    connectTimeout = conf.connectTimeout ?? CONNECT_TIMEOUT,
+  } = options;
   const plugin = new URL("./plugin.ts", import.meta.url);
   const commands = [
-    ...(options.prelude ?? []),
+    ...prelude,
     "let g:denops#_test = 1",
     `set runtimepath^=${conf.denopsPath.replace(/ /g, "\\ ")}`,
     [
       "try",
-      `  call denops#server#wait_async({ -> denops#plugin#load('${name}', '${plugin}') })`,
+      `  call denops#server#wait_async({ -> denops#plugin#load('${pluginName}', '${plugin}') })`,
       "catch /^Vim\\%((\\a\\+)\\)\\=:E117:/",
-      `  execute 'autocmd User DenopsReady call denops#plugin#register(''${name}'', ''${plugin}'')'`,
+      `  execute 'autocmd User DenopsReady call denops#plugin#register(''${pluginName}'', ''${plugin}'')'`,
       "endtry",
     ].join(" | "),
     "call denops#server#start()",
-    ...(options.postlude ?? []),
+    ...postlude,
   ];
-  const listener = Deno.listen({
+  const aborter = new AbortController();
+  const { signal } = aborter;
+  using listener = Deno.listen({
     hostname: "127.0.0.1",
     port: 0, // Automatically select a free port
   });
-  const proc = run(mode, commands, {
-    verbose: options.verbose,
-    env: {
-      "DENOPS_TEST_ADDRESS": JSON.stringify(listener.addr),
-    },
-  });
-  const conn = await deadline(listener.accept(), CONNECT_TIMEOUT);
-  try {
+  const getConn = async () => {
+    try {
+      return await deadline(listener.accept(), connectTimeout, { signal });
+    } catch (cause: unknown) {
+      throw new Error("[denops-test] Connection failed.", { cause });
+    } finally {
+      listener.close();
+    }
+  };
+  const createSession = (conn: Deno.Conn) => {
     const session = new Session(conn.readable, conn.writable, {
       errorSerializer,
     });
@@ -105,7 +117,9 @@ export async function withDenops(
         `[denops-test] Unexpected error occurred for message ${message}: ${err}`,
       );
     };
-    session.start();
+    return session;
+  };
+  const createDenops = async (session: Session) => {
     const client = new Client(session, {
       errorDeserializer,
     });
@@ -114,7 +128,7 @@ export async function withDenops(
       "call",
       ["denops#_internal#meta#get"],
     ) as Meta;
-    const denops = new DenopsImpl(name, meta, client);
+    const denops = new DenopsImpl(pluginName, meta, client);
     session.dispatcher = {
       dispatch: (name, args) => {
         assert(name, is.String);
@@ -122,17 +136,49 @@ export async function withDenops(
         return denops.dispatcher[name](...args);
       },
     };
-    // Workaround for an unexpected "leaking async ops"
-    // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    await main(denops);
-    await session.shutdown();
-  } finally {
-    listener.close();
-    proc.kill();
-    await Promise.all([
-      proc.stdin?.close(),
-      proc.output(),
-    ]);
-  }
+    return denops;
+  };
+  const perform = async () => {
+    using conn = await getConn();
+    const session = createSession(conn);
+    session.start();
+    try {
+      const denops = await createDenops(session);
+
+      // Workaround for an unexpected "leaking async ops"
+      // https://github.com/denoland/deno/issues/15425#issuecomment-1368245954
+      // Maybe fixed in v1.41.0
+      // https://github.com/denoland/deno/pull/22413
+      // TODO: Remove this workaround when Deno minimum version changes to v1.41.0 or higher
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      await main(denops);
+    } finally {
+      try {
+        await session.shutdown();
+      } catch {
+        // Already shutdown, do nothing.
+      }
+    }
+  };
+  await using runner = run(mode, commands, {
+    verbose,
+    env: {
+      "DENOPS_TEST_ADDRESS": JSON.stringify(listener.addr),
+    },
+  });
+  await Promise.race([
+    perform(),
+    runner.waitClosed().then(({ status, output }) => {
+      aborter.abort("closed");
+      if (!status.success) {
+        const suffix = output?.length
+          ? `:\n------- output -------\n${output}\n----- output end -----`
+          : ".";
+        throw new Error(
+          `[denops-test] Process aborted (${mode}, code=${status.code})${suffix}`,
+        );
+      }
+    }),
+  ]);
 }
