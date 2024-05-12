@@ -98,7 +98,8 @@ jobs:
       - run: |
           deno coverage --unstable .coverage --lcov > coverage.lcov
         working-directory: ./repo
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           os: ${{ runner.os }}
           files: ./coverage.lcov
+          token: ${{ secrets.CODECOV_TOKEN }}
