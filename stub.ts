@@ -1,4 +1,4 @@
-import { Context, Denops, Dispatcher, Meta } from "jsr:@denops/core@6.0.6";
+import type { Context, Denops, Dispatcher, Meta } from "jsr:@denops/core@6.0.6";
 
 /**
  * Represents a stubber object for `Denops`.

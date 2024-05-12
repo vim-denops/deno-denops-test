@@ -1,7 +1,7 @@
 import { mergeReadableStreams } from "jsr:@std/streams@0.224.0/merge-readable-streams";
 import { is } from "jsr:@core/unknownutil@3.18.0";
 import { unreachable } from "jsr:@lambdalisue/errorutil@1.0.0";
-import { Config, getConfig } from "./conf.ts";
+import { type Config, getConfig } from "./conf.ts";
 
 /**
  * Represents the mode in which the runner operates.
