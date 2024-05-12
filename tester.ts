@@ -93,12 +93,6 @@ export function test(
   fn?: TestDefinition["fn"],
 ): void {
   if (typeof modeOrDefinition === "string") {
-    if (!name) {
-      throw new Error(`'name' attribute is required`);
-    }
-    if (!fn) {
-      throw new Error(`'fn' attribute is required`);
-    }
     testInternal({
       mode: modeOrDefinition,
       name,
@@ -109,35 +103,57 @@ export function test(
   }
 }
 
-function testInternal(def: TestDefinition): void {
-  const { mode } = def;
+function testInternal(def: Partial<TestDefinition>): void {
+  const {
+    mode,
+    name,
+    fn,
+    pluginName,
+    verbose,
+    prelude,
+    postlude,
+    ...denoTestDef
+  } = def;
+  if (!mode) {
+    throw new Error("'mode' attribute is required");
+  }
+  if (!name) {
+    throw new Error("'name' attribute is required");
+  }
+  if (!fn) {
+    throw new Error("'fn' attribute is required");
+  }
   if (mode === "all") {
     testInternal({
       ...def,
-      name: `${def.name} (vim)`,
+      name: `${name} (vim)`,
       mode: "vim",
     });
     testInternal({
       ...def,
-      name: `${def.name} (nvim)`,
+      name: `${name} (nvim)`,
       mode: "nvim",
     });
   } else if (mode === "any") {
     const m = sample(["vim", "nvim"] as const)!;
     testInternal({
       ...def,
-      name: `${def.name} (${m})`,
+      name: `${name} (${m})`,
       mode: m,
     });
   } else {
+    if (!["vim", "nvim"].includes(mode)) {
+      throw new Error(`'mode' attribute is invalid: ${mode}`);
+    }
     Deno.test({
-      ...def,
+      ...denoTestDef,
+      name,
       fn: (t) => {
-        return withDenops(mode, (denops) => def.fn(denops, t), {
-          pluginName: def.pluginName,
-          verbose: def.verbose,
-          prelude: def.prelude,
-          postlude: def.postlude,
+        return withDenops(mode, (denops) => fn.call(def, denops, t), {
+          pluginName,
+          verbose,
+          prelude,
+          postlude,
         });
       },
     });
