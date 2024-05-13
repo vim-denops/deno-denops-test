@@ -1,5 +1,6 @@
 import {
   assert,
+  assertArrayIncludes,
   assertEquals,
   assertFalse,
   assertRejects,
@@ -27,12 +28,33 @@ Deno.test("test(mode:nvim) start nvim to test denops features", async () => {
 for (const mode of ["vim", "nvim"] as const) {
   Deno.test(`test(mode:${mode}) outputs ${mode} messages if 'verbose' option is true`, async () => {
     using s = stub(console, "error");
-    await withDenops("vim", async (denops: Denops) => {
-      await denops.cmd("echomsg 'foobar'");
+    await withDenops(mode, async (denops: Denops) => {
+      await denops.cmd("echomsg 'Hello. Hello. Hello. Hello. Hello. Hello.'");
+      await denops.cmd("echomsg 'World. World. World. World. World. World.'");
     }, { verbose: true });
-    // NOTE: Maybe some other values are included, so find target with `Array.some`.
-    // NOTE: Maybe "\r" or "\n" is prepend or postpend, so use `String.trim`.
-    assert(s.calls.some((c) => c.args[0].trim() === "foobar"));
+    const rawOutput = s.calls.map((c) => c.args[0]);
+    const normOutput = rawOutput.join("").split("\r\n").map((v) => v.trim());
+    //
+    // NOTE:
+    //
+    // It appears that Neovim doesn't insert any delimiters between consecutive 'echomsg' calls,
+    // and the chunk lengths are unstable as a result.
+    // This inconsistency causes issues with Neovim's verbose output, but we couldn't find a workaround
+    // to resolve this problem.
+    // Interestingly, this issue only arises when producing verbose output using denops.vim, making it
+    // difficult for us to reproduce the phenomenon and report it to Neovim's issue tracker.
+    // While verbose output is essential for debugging, we're forced to accept our current situation.
+    //
+    if (mode === "vim") {
+      assertArrayIncludes(normOutput, [
+        "Hello. Hello. Hello. Hello. Hello. Hello.",
+        "World. World. World. World. World. World.",
+      ]);
+    } else {
+      assertArrayIncludes(normOutput, [
+        "Hello. Hello. Hello. Hello. Hello. Hello.World. World. World. World. World. World.",
+      ]);
+    }
   });
 
   Deno.test(`test(mode:${mode}) should be able to call Denops#redraw()`, async () => {
