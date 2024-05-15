@@ -119,6 +119,8 @@ function buildArgs(conf: Config, mode: RunMode): [string, string[]] {
           "-V1", // Verbose level 1 (Echo messages to stderr)
           "-c",
           "visual", // Go to Normal mode
+          "-c",
+          "set columns=9999", // Avoid unwilling output newline
         ],
       ];
     case "nvim":
@@ -129,6 +131,8 @@ function buildArgs(conf: Config, mode: RunMode): [string, string[]] {
           "--headless",
           "-n", // Disable swap file
           "-V1", // Verbose level 1 (Echo messages to stderr)
+          "-c",
+          "set columns=9999", // Avoid unwilling output newline
         ],
       ];
     default:
