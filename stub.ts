@@ -1,4 +1,9 @@
-import type { Context, Denops, Dispatcher, Meta } from "jsr:@denops/core@6.0.6";
+import type {
+  Context,
+  Denops,
+  Dispatcher,
+  Meta,
+} from "jsr:@denops/core@7.0.0-pre0";
 
 /**
  * Represents a stubber object for `Denops`.
@@ -22,6 +27,12 @@ export interface DenopsStubber {
    * ```
    */
   meta?: Meta;
+
+  /**
+   * AbortSignal instance that is triggered when the user invoke `denops#interrupt()`
+   * If not specified, it returns a new instance of `AbortSignal`.
+   */
+  interrupted?: AbortSignal;
   /**
    * A stub function for the `redraw` method of `Denops`.
    * If not specified, it returns a promise resolving to undefined.
@@ -94,6 +105,10 @@ export class DenopsStub implements Denops {
       version: "0.0.0",
       platform: "linux",
     };
+  }
+
+  get interrupted(): AbortSignal {
+    return this.#stubber.interrupted ?? AbortSignal.any([]);
   }
 
   /**
