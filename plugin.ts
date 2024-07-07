@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/core@6.0.6";
+import type { Denops } from "jsr:@denops/core@7.0.0";
 import { assert, ensure, is } from "jsr:@core/unknownutil@3.18.0";
 import { Client, Session } from "jsr:@lambdalisue/messagepack-rpc@2.1.1";
 import { errorDeserializer, errorSerializer } from "./error.ts";

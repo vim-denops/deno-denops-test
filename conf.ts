@@ -1,4 +1,4 @@
-import { resolve } from "jsr:@std/path@0.225.0/resolve";
+import { resolve } from "jsr:@std/path@1.0.1/resolve";
 
 let conf: Config | undefined;
 
