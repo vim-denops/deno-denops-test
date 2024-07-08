@@ -6,7 +6,7 @@ import {
   assertRejects,
 } from "jsr:@std/assert@0.225.1";
 import { assertSpyCalls, spy, stub } from "jsr:@std/testing@0.224.0/mock";
-import type { Denops } from "jsr:@denops/core@7.0.0-pre0";
+import type { Denops } from "jsr:@denops/core@7.0.0-pre1";
 import { withDenops } from "./with.ts";
 
 Deno.test("test(mode:vim) start vim to test denops features", async () => {

@@ -1,7 +1,7 @@
 import { deadline } from "jsr:@std/async@0.224.0/deadline";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 import { Client, Session } from "jsr:@lambdalisue/messagepack-rpc@2.1.1";
-import type { Denops, Meta } from "jsr:@denops/core@7.0.0-pre0";
+import type { Denops, Meta } from "jsr:@denops/core@7.0.0-pre1";
 import { getConfig } from "./conf.ts";
 import { run, type RunMode } from "./runner.ts";
 import { DenopsImpl } from "./denops.ts";

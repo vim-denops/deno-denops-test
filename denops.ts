@@ -3,7 +3,7 @@ import type {
   Denops,
   Dispatcher,
   Meta,
-} from "jsr:@denops/core@7.0.0-pre0";
+} from "jsr:@denops/core@7.0.0-pre1";
 import type { Client } from "jsr:@lambdalisue/messagepack-rpc@2.1.1";
 
 export class DenopsImpl implements Denops {

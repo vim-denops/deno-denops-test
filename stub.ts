@@ -3,7 +3,7 @@ import type {
   Denops,
   Dispatcher,
   Meta,
-} from "jsr:@denops/core@7.0.0-pre0";
+} from "jsr:@denops/core@7.0.0-pre1";
 
 /**
  * Represents a stubber object for `Denops`.
