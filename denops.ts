@@ -1,10 +1,11 @@
-import type { Context, Denops, Dispatcher, Meta } from "jsr:@denops/core@6.0.6";
+import type { Context, Denops, Dispatcher, Meta } from "jsr:@denops/core@7.0.0";
 import type { Client } from "jsr:@lambdalisue/messagepack-rpc@2.1.1";
 
 export class DenopsImpl implements Denops {
   readonly name: string;
   readonly meta: Meta;
   readonly context: Record<string | number | symbol, unknown> = {};
+  readonly interrupted = AbortSignal.any([]);
 
   dispatcher: Dispatcher = {};
 
