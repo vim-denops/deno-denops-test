@@ -88,7 +88,7 @@ test({
   fn: (denops) => {
     assertEquals(
       denops.name,
-      "@denops-test",
+      "denops-test",
     );
   },
 });

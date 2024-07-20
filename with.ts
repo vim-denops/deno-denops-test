@@ -7,7 +7,7 @@ import { run, type RunMode } from "./runner.ts";
 import { DenopsImpl } from "./denops.ts";
 import { errorDeserializer, errorSerializer } from "./error.ts";
 
-const PLUGIN_NAME = "@denops-test";
+const PLUGIN_NAME = "denops-test";
 
 // Timeout for connecting to Vim/Neovim
 // It takes a long time to start Vim/Neovim on Windows, so set a long timeout
