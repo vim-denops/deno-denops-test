@@ -1,5 +1,5 @@
 import { deadline } from "jsr:@std/async@1.0.0/deadline";
-import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
 import { Client, Session } from "jsr:@lambdalisue/messagepack-rpc@2.1.1";
 import type { Denops, Meta } from "jsr:@denops/core@7.0.0";
 import { getConfig } from "./conf.ts";
