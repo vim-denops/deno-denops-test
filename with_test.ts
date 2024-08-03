@@ -31,6 +31,8 @@ for (const mode of ["vim", "nvim"] as const) {
     await withDenops(mode, async (denops: Denops) => {
       await denops.cmd("echomsg 'Hello. Hello. Hello. Hello. Hello. Hello.'");
       await denops.cmd("echomsg 'World. World. World. World. World. World.'");
+      // To avoid message cutoff, execute arbitrary command.
+      await denops.cmd("redraw");
     }, { verbose: true });
     const rawOutput = s.calls.map((c) => c.args[0]);
     const normOutput = rawOutput.join("").split("\r\n").map((v) => v.trim());
