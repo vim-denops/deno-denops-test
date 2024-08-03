@@ -1,5 +1,5 @@
 import type { Denops } from "jsr:@denops/core@7.0.0";
-import { assert, ensure, is } from "jsr:@core/unknownutil@3.18.0";
+import { as, assert, ensure, is } from "jsr:@core/unknownutil@^4.0.0";
 import { Client, Session } from "jsr:@lambdalisue/messagepack-rpc@2.1.1";
 import { errorDeserializer, errorSerializer } from "./error.ts";
 
@@ -70,7 +70,7 @@ function invoke(
   }
 }
 
-const isRedrawArgs = is.TupleOf([is.OptionalOf(is.Boolean)] as const);
+const isRedrawArgs = is.TupleOf([as.Optional(is.Boolean)] as const);
 
 const isCallArgs = (v: unknown): v is [string, ...unknown[]] => {
   return is.Array(v) && is.String(v[0]);
@@ -78,9 +78,9 @@ const isCallArgs = (v: unknown): v is [string, ...unknown[]] => {
 
 const isBatchArgs = is.ArrayOf(isCallArgs);
 
-const isCmdArgs = is.TupleOf([is.String, is.OptionalOf(is.Record)] as const);
+const isCmdArgs = is.TupleOf([is.String, as.Optional(is.Record)] as const);
 
-const isEvalArgs = is.TupleOf([is.String, is.OptionalOf(is.Record)] as const);
+const isEvalArgs = is.TupleOf([is.String, as.Optional(is.Record)] as const);
 
 const isDispatchArgs = (v: unknown): v is [string, string, ...unknown[]] => {
   return is.Array(v) && is.String(v[0]) && is.String(v[1]);
