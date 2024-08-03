@@ -4,6 +4,10 @@
 [![Test](https://github.com/vim-denops/deno-denops-test/actions/workflows/test.yml/badge.svg)](https://github.com/vim-denops/deno-denops-test/actions/workflows/test.yml)
 [![codecov](https://codecov.io/github/vim-denops/deno-denops-test/branch/main/graph/badge.svg?token=X9O5XB4O1S)](https://codecov.io/github/vim-denops/deno-denops-test)
 
+[![Deno 1.45.0 or above](https://img.shields.io/badge/Deno-Support%201.45.0-yellowgreen.svg?logo=deno)](https://github.com/denoland/deno/tree/v1.45.0)
+[![Vim 9.1.0448 or above](https://img.shields.io/badge/Vim-Support%209.1.0448-yellowgreen.svg?logo=vim)](https://github.com/vim/vim/tree/v9.1.0448)
+[![Neovim 0.10.0 or above](https://img.shields.io/badge/Neovim-Support%200.10.0-yellowgreen.svg?logo=neovim&logoColor=white)](https://github.com/neovim/neovim/tree/v0.10.0)
+
 A [Deno] module designed for testing [denops.vim]. This module is intended to be
 used in the unit tests of denops plugins.
 
