@@ -89,10 +89,32 @@ Deno.test("denops.call", async () => {
 Copy and modify the following GitHub Workflow to run tests in GitHub Action
 
 ```yaml
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "**.md"
+      - "**.ts"
+      - "deno.jsonc"
+      - ".github/workflows/test.yml"
+  workflow_dispatch:
+    inputs:
+      denops_branch:
+        description: 'Denops branch to test'
+        required: false
+        default: 'main'
+
 # Use 'bash' as default shell even on Windows
 defaults:
   run:
     shell: bash --noprofile --norc -eo pipefail {0}
+
+env:
+  DENOPS_BRANCH: ${{ github.event.inputs.denops_branch || 'main' }}
 
 jobs:
   test:
@@ -103,7 +125,7 @@ jobs:
           - macos-latest
           - ubuntu-latest
         deno_version:
-          - "1.45.x"
+          - "1.45.0"
           - "1.x"
         host_version:
           - vim: "v9.1.0448"
@@ -125,6 +147,11 @@ jobs:
         run: |
           git clone https://github.com/vim-denops/denops.vim /tmp/denops.vim
           echo "DENOPS_TEST_DENOPS_PATH=/tmp/denops.vim" >> "$GITHUB_ENV"
+
+      - name: Try switching denops branch
+        run: |
+          git -C /tmp/denops.vim switch ${{ env.DENOPS_BRANCH }} || true
+          git -C /tmp/denops.vim branch
 
       - uses: rhysd/action-setup-vim@v1
         id: vim
