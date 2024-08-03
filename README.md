@@ -4,6 +4,10 @@
 [![Test](https://github.com/vim-denops/deno-denops-test/actions/workflows/test.yml/badge.svg)](https://github.com/vim-denops/deno-denops-test/actions/workflows/test.yml)
 [![codecov](https://codecov.io/github/vim-denops/deno-denops-test/branch/main/graph/badge.svg?token=X9O5XB4O1S)](https://codecov.io/github/vim-denops/deno-denops-test)
 
+[![Deno 1.45.0 or above](https://img.shields.io/badge/Deno-Support%201.45.0-yellowgreen.svg?logo=deno)](https://github.com/denoland/deno/tree/v1.45.0)
+[![Vim 9.1.0448 or above](https://img.shields.io/badge/Vim-Support%209.1.0448-yellowgreen.svg?logo=vim)](https://github.com/vim/vim/tree/v9.1.0448)
+[![Neovim 0.10.0 or above](https://img.shields.io/badge/Neovim-Support%200.10.0-yellowgreen.svg?logo=neovim&logoColor=white)](https://github.com/neovim/neovim/tree/v0.10.0)
+
 A [Deno] module designed for testing [denops.vim]. This module is intended to be
 used in the unit tests of denops plugins.
 
@@ -85,10 +89,32 @@ Deno.test("denops.call", async () => {
 Copy and modify the following GitHub Workflow to run tests in GitHub Action
 
 ```yaml
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "**.md"
+      - "**.ts"
+      - "deno.jsonc"
+      - ".github/workflows/test.yml"
+  workflow_dispatch:
+    inputs:
+      denops_branch:
+        description: 'Denops branch to test'
+        required: false
+        default: 'main'
+
 # Use 'bash' as default shell even on Windows
 defaults:
   run:
     shell: bash --noprofile --norc -eo pipefail {0}
+
+env:
+  DENOPS_BRANCH: ${{ github.event.inputs.denops_branch || 'main' }}
 
 jobs:
   test:
@@ -99,7 +125,7 @@ jobs:
           - macos-latest
           - ubuntu-latest
         deno_version:
-          - "1.45.x"
+          - "1.45.0"
           - "1.x"
         host_version:
           - vim: "v9.1.0448"
@@ -121,6 +147,11 @@ jobs:
         run: |
           git clone https://github.com/vim-denops/denops.vim /tmp/denops.vim
           echo "DENOPS_TEST_DENOPS_PATH=/tmp/denops.vim" >> "$GITHUB_ENV"
+
+      - name: Try switching denops branch
+        run: |
+          git -C /tmp/denops.vim switch ${{ env.DENOPS_BRANCH }} || true
+          git -C /tmp/denops.vim branch
 
       - uses: rhysd/action-setup-vim@v1
         id: vim
