@@ -1,6 +1,6 @@
-import type { Denops } from "jsr:@denops/core@7.0.0";
+import type { Denops } from "jsr:@denops/core@^7.0.0";
 import { as, assert, ensure, is } from "jsr:@core/unknownutil@^4.0.0";
-import { Client, Session } from "jsr:@lambdalisue/messagepack-rpc@2.1.1";
+import { Client, Session } from "jsr:@lambdalisue/messagepack-rpc@^2.1.1";
 import { errorDeserializer, errorSerializer } from "./error.ts";
 
 export async function main(denops: Denops): Promise<void> {

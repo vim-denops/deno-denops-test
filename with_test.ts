@@ -4,9 +4,9 @@ import {
   assertEquals,
   assertFalse,
   assertRejects,
-} from "jsr:@std/assert@1.0.0";
-import { assertSpyCalls, spy, stub } from "jsr:@std/testing@0.225.3/mock";
-import type { Denops } from "jsr:@denops/core@7.0.0";
+} from "jsr:@std/assert@^1.0.0";
+import { assertSpyCalls, spy, stub } from "jsr:@std/testing@^0.225.3/mock";
+import type { Denops } from "jsr:@denops/core@^7.0.0";
 import { withDenops } from "./with.ts";
 
 Deno.test("test(mode:vim) start vim to test denops features", async () => {

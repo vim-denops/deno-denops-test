@@ -1,5 +1,5 @@
-import { sample } from "jsr:@std/collections@1.0.5/sample";
-import type { Denops } from "jsr:@denops/core@7.0.0";
+import { sample } from "jsr:@std/collections@^1.0.5/sample";
+import type { Denops } from "jsr:@denops/core@^7.0.0";
 import type { RunMode } from "./runner.ts";
 import { withDenops } from "./with.ts";
 
