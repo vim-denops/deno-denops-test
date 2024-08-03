@@ -3,7 +3,7 @@ import {
   assertEquals,
   assertFalse,
   assertThrows,
-} from "jsr:@std/assert@1.0.0";
+} from "jsr:@std/assert@^1.0.0";
 import { test } from "./tester.ts";
 
 test({

@@ -1,6 +1,6 @@
-import { assertSpyCall, spy } from "jsr:@std/testing@0.225.3/mock";
-import { assertEquals } from "jsr:@std/assert@1.0.0";
-import type { Denops } from "jsr:@denops/core@7.0.0";
+import { assertSpyCall, spy } from "jsr:@std/testing@^0.225.3/mock";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import type { Denops } from "jsr:@denops/core@^7.0.0";
 import { DenopsStub } from "./stub.ts";
 
 Deno.test("`DenopsStub`", async (t) => {
