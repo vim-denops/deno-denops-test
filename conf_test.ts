@@ -4,7 +4,7 @@ import {
   assertObjectMatch,
   assertThrows,
 } from "jsr:@std/assert@^1.0.0";
-import { stub } from "jsr:@std/testing@^0.225.3/mock";
+import { stub } from "jsr:@std/testing@^1.0.0/mock";
 import { basename, isAbsolute } from "jsr:@std/path@^1.0.1";
 import { _internal, getConfig } from "./conf.ts";
 
