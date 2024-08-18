@@ -58,7 +58,10 @@ jobs:
           git diff --exit-code
 
   test:
+    needs: check
+
     strategy:
+      fail-fast: false
       matrix:
         runner:
           - windows-latest
@@ -133,6 +136,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   jsr-publish:
+    needs: check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
