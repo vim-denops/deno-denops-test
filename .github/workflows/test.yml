@@ -16,6 +16,11 @@ on:
         description: 'Denops revision to test'
         required: false
         default: 'main'
+      verbose:
+        type: boolean
+        required: false
+        description: 'Enable verbose output'
+        default: false
 
 defaults:
   run:
@@ -23,6 +28,7 @@ defaults:
 
 env:
   DENOPS_BRANCH: ${{ github.event.inputs.denops_branch || 'main' }}
+  DENOPS_TEST_VERBOSE: ${{ github.event.inputs.verbose }}
 
 jobs:
   check:
@@ -52,13 +58,19 @@ jobs:
       - name: Type check
         run: deno task check
 
+      - name: Doc check
+        run: deno task check:doc
+
       - name: Supported version inconsistency check
         run: |
           deno task apply:supported-versions
           git diff --exit-code
 
   test:
+    needs: check
+
     strategy:
+      fail-fast: false
       matrix:
         runner:
           - windows-latest
@@ -133,6 +145,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   jsr-publish:
+    needs: check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
