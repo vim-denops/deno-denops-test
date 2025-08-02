@@ -104,9 +104,9 @@ on:
   workflow_dispatch:
     inputs:
       denops_branch:
-        description: 'Denops branch to test'
+        description: "Denops branch to test"
         required: false
-        default: 'main'
+        default: "main"
 
 # Use 'bash' as default shell even on Windows
 defaults:
@@ -177,7 +177,7 @@ jobs:
 
       - name: Perform pre-cache
         run: |
-          deno cache ${DENOPS_TEST_DENOPS_PATH}/denops/@denops-private/mod.ts
+          deno cache --config ${DENOPS_TEST_DENOPS_PATH}/denops/@denops-private/deno.jsonc ${DENOPS_TEST_DENOPS_PATH}/denops/@denops-private/mod.ts
           deno cache ./denops/your_plugin/main.ts
 
       - name: Run tests
