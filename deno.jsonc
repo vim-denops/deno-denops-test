@@ -4,12 +4,12 @@
     ".": "./mod.ts",
     "./stub": "./stub.ts",
     "./tester": "./tester.ts",
-    "./with": "./with.ts",
+    "./with": "./with.ts"
   },
   "exclude": [".coverage"],
   "publish": {
     "include": ["**/*.ts", "README.md", "LICENSE"],
-    "exclude": ["**/*_test.ts", ".*"],
+    "exclude": ["**/*_test.ts", ".*"]
   },
   "tasks": {
     "check": "deno check **/*.ts",
@@ -19,9 +19,14 @@
     "coverage": "deno coverage .coverage",
     "update": "deno run --allow-env --allow-read --allow-write=. --allow-run=git,deno --allow-net=jsr.io,registry.npmjs.org jsr:@molt/cli ./*.ts",
     "update:commit": "deno task -q update --commit --prefix :package: --pre-commit=fmt,lint",
-    "apply:supported-versions": "deno run --allow-env --allow-net --allow-read --allow-write .scripts/apply-supported-versions.ts",
+    "apply:supported-versions": "deno run --allow-env --allow-net --allow-read --allow-write .scripts/apply-supported-versions.ts"
   },
   "imports": {
-    "jsr:@denops/test": "./mod.ts",
+    "jsr:@denops/test": "./mod.ts"
   },
+  "lint": {
+    "rules": {
+      "exclude": ["no-import-prefix"]
+    }
+  }
 }
