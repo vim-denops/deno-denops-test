@@ -132,6 +132,9 @@ jobs:
           deno cache --config ${DENOPS_TEST_DENOPS_PATH}/denops/@denops-private/deno.jsonc ${DENOPS_TEST_DENOPS_PATH}/denops/@denops-private/mod.ts
           deno cache ./mod.ts
 
+      - name: Check dependency graph
+        run: deno info ./mod.ts
+
       - name: Run tests
         run: deno task test:coverage
         timeout-minutes: 15
